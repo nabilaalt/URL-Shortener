@@ -1,0 +1,33 @@
+Node modules
+node_modules/
+
+Build output
+build/
+dist/
+
+Logs
+*.log
+
+Dependency directories
+jspm_packages/
+
+IDE and editor folders
+.vscode/
+.idea/
+
+OS files
+.DS_Store
+Thumbs.db
+
+Environment variables file
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+npm package-lock file (optional)
+package-lock.json
+
+Yarn lock file (optional)
+yarn.lock
