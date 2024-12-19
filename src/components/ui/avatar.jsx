@@ -1,8 +1,10 @@
+/* eslint-disable react/prop-types */
 import * as React from "react"
 import * as AvatarPrimitive from "@radix-ui/react-avatar"
 
 import { cn } from "@/lib/utils"
 
+// eslint-disable-next-line react/prop-types
 const Avatar = React.forwardRef(({ className, ...props }, ref) => (
   <AvatarPrimitive.Root
     ref={ref}
