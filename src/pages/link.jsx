@@ -50,13 +50,18 @@ const LinkPage = () => {
   const {loading: loadingDelete, fn: fnDelete} = useFetch(deleteUrl, id);
 
   useEffect(() => {
-    fn();
-  }, []);
+    if (!url) fn(); // Fetch hanya sekali
+  }, [url]);
 
   useEffect(() => {
-    if (!error && loading === false) fnStats();
-  }, [loading, error]);
-
+    if (!error && loading === false && url && !loadingStats) {
+      fnStats();
+    }
+  }, [loading, error, url, loadingStats]);
+  
+  if (loading || !url) {
+    return <BarLoader width={"100%"} color="#36d7b7" />;
+  }
   if (error) {
     navigate("/dashboard");
   }
