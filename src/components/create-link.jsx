@@ -21,7 +21,7 @@ import {QRCode} from "react-qrcode-logo";
 
 export function CreateLink() {
   const {user} = UrlState();
-
+  const userId = localStorage.getItem("userId");
   const navigate = useNavigate();
   const ref = useRef();
 
@@ -56,7 +56,7 @@ export function CreateLink() {
     error,
     data,
     fn: fnCreateUrl,
-  } = useFetch(createUrl, {...formValues, user_id: user.id});
+  } = useFetch(createUrl, {...formValues, user_id: userId});
 
   useEffect(() => {
     if (error === null && data) {

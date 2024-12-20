@@ -20,9 +20,12 @@
     "@supabase/supabase-js": "^2.43.4",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
+    "jose": "^5.9.6",
+    "jsonwebtoken": "^9.0.2",
     "lucide-react": "^0.394.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-hot-toast": "^2.4.1",
     "react-qrcode-logo": "^3.0.0",
     "react-router-dom": "^6.23.1",
     "react-spinners": "^0.13.8",
@@ -30,6 +33,7 @@
     "tailwind-merge": "^2.3.0",
     "tailwindcss-animate": "^1.0.7",
     "ua-parser-js": "^2.0.0-beta.3",
+    "url-shortener": "file:",
     "yup": "^1.4.0"
   },
   "devDependencies": {

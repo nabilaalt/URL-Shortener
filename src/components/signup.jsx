@@ -1,4 +1,5 @@
 import {useEffect, useState} from "react";
+import {toast} from "react-hot-toast";
 import Error from "./error";
 import {Input} from "./ui/input";
 import * as Yup from "yup";
@@ -11,14 +12,13 @@ import {
   CardTitle,
 } from "./ui/card";
 import {Button} from "./ui/button";
-import {useNavigate, useSearchParams} from "react-router-dom";
+import {useNavigate} from "react-router-dom";
 import {signup} from "@/db/apiAuth";
 import {BeatLoader} from "react-spinners";
 import useFetch from "@/hooks/use-fetch";
 
 const Signup = () => {
-  let [searchParams] = useSearchParams();
-  const longLink = searchParams.get("createNew");
+
 
   const navigate = useNavigate();
 
@@ -42,7 +42,10 @@ const Signup = () => {
 
   useEffect(() => {
     if (error === null && data) {
-      navigate(`/dashboard?${longLink ? `createNew=${longLink}` : ""}`);
+      toast.success("Verification email sent! Please verify before logging in.", {
+        duration: 3000, // To make the toast visible for 5 seconds
+      });
+      navigate('/auth');
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [error, loading]);
@@ -58,7 +61,7 @@ const Signup = () => {
         password: Yup.string()
           .min(6, "Password must be at least 6 characters")
           .required("Password is required"),
-        profile_pic: Yup.mixed().required("Profile picture is required"),
+        profile_pic: Yup.mixed().required("Profile picture is required").optional(),
       });
 
       await schema.validate(formData, {abortEarly: false});
