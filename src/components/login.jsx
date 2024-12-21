@@ -82,7 +82,7 @@ const Login = () => {
         </CardDescription>
         {error && <Error message={error.message} />}
       </CardHeader>
-      <CardContent className="space-y-4">
+      <CardContent className="space-y-5">
         <div className="space-y-2">
           <Input
             name="email"
@@ -104,11 +104,36 @@ const Login = () => {
         </div>
         {errors.password && <Error message={errors.password} />}
       </CardContent>
-      <CardFooter>
-        <Button onClick={handleLogin} disabled={loading}>
-          {loading ? <BeatLoader size={10} color="#36d7b7" /> : "Login"}
-        </Button>
-      </CardFooter>
+
+      <CardFooter className="flex flex-col space-y-4 pt-">
+
+  <Button 
+    onClick={handleLogin}
+    disabled={loading}
+    className="w-full">
+    {loading ? <BeatLoader size={10} color="#36d7b7" /> : "Login"}
+  </Button>
+
+  <Button 
+    onClick={() => console.log('Login with Google clicked')} 
+    disabled={loading}
+    className="w-full flex items-center justify-center bg-white border border-gray-300 text-gray-700 hover:bg-gray-200">
+    <img 
+      src="public/logo-google.png" 
+      alt="Google Logo" 
+      className="w-5 h-5 mr-2" />
+    {loading ? <BeatLoader size={10} color="#36d7b7" /> : "Login With Google"}
+  </Button>
+
+</CardFooter>
+<div className="flex justify-end w-full pr-6">
+    <button 
+      onClick={() => console.log("Forgot your password?")} 
+      disabled={loading}
+      className="text-sm text-blue-400 hover:underline pb-6">
+      Forgot your password?
+    </button>
+  </div>
     </Card>
   );
 };

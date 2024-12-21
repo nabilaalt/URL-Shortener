@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import DeviceStats from "@/components/device-stats";
 import Location from "@/components/location-stats";
 import {Button} from "@/components/ui/button";

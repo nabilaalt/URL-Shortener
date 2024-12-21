@@ -1,9 +1,11 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import Login from "@/components/login";
 import Signup from "@/components/signup";
 import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs";
 import {UrlState} from "@/context";
 import {useEffect} from "react";
 import {useNavigate, useSearchParams} from "react-router-dom";
+// import ForgotPassword from "@/components/forgot-pass"; 
 
 function Auth() {
   let [searchParams] = useSearchParams();
@@ -24,7 +26,7 @@ function Auth() {
           : "Login / Signup"}
       </h1>
       <Tabs defaultValue="login" className="w-[400px]">
-        <TabsList className="grid w-full grid-cols-2">
+        <TabsList className="grid w-full grid-cols-2"> {/* Mengubah grid-cols menjadi 3 */}
           <TabsTrigger value="login">Login</TabsTrigger>
           <TabsTrigger value="signup">Signup</TabsTrigger>
         </TabsList>
@@ -34,6 +36,7 @@ function Auth() {
         <TabsContent value="signup">
           <Signup />
         </TabsContent>
+      
       </Tabs>
     </div>
   );

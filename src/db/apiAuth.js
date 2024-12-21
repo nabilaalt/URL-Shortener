@@ -11,6 +11,7 @@ export async function login({email, password}) {
   return data;
 }
 
+
 export async function signup({name, email, password, profile_pic}) {
   const fileName = `dp-${name.split(" ").join("-")}-${Math.random()}`;
 
@@ -34,6 +35,22 @@ export async function signup({name, email, password, profile_pic}) {
   if (error) throw new Error(error.message);
 
   return data;
+}
+
+export async function resetPassword({ email }) {
+  const { error } = await supabase.auth.api.resetPasswordForEmail(email);
+
+  if (error) throw new Error(error.message);
+
+  return { message: 'Password reset email sent successfully.' };
+}
+
+export async function sendVerificationEmail({ email }) {
+  const { error } = await supabase.auth.api.sendPasswordResetEmail(email);
+
+  if (error) throw new Error(error.message);
+
+  return { message: "Verification email sent." };
 }
 
 export async function getCurrentUser() {

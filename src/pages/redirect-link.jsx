@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import {storeClicks} from "@/db/apiClicks";
 import {getLongUrl} from "@/db/apiUrls";
 import useFetch from "@/hooks/use-fetch";
