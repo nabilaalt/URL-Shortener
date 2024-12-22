@@ -1,5 +1,8 @@
-import { useEffect, useState, useCallback } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import {useEffect, useState} from "react";
+import {toast} from "react-hot-toast";
+import Error from "./error";
+import {Input} from "./ui/input";
+
 import * as Yup from "yup";
 import { signup } from "@/db/apiAuth";
 import useFetch from "@/hooks/use-fetch";
@@ -16,11 +19,15 @@ import {
   CardHeader,
   CardTitle,
 } from "./ui/card";
-import { Button } from "./ui/button";
+
+import {Button} from "./ui/button";
+import {useNavigate} from "react-router-dom";
+import {signup} from "@/db/apiAuth";
+import {BeatLoader} from "react-spinners";
+import useFetch from "@/hooks/use-fetch";
 
 const Signup = () => {
-  // Hooks
-  const [searchParams] = useSearchParams();
+
   const navigate = useNavigate();
   const longLink = searchParams.get("createNew");
 
@@ -45,21 +52,32 @@ const Signup = () => {
     }));
   }, []);
 
-  // Validation Schema
-  const validationSchema = Yup.object().shape({
-    name: Yup.string().required("Name is required"),
-    email: Yup.string().email("Invalid email").required("Email is required"),
-    password: Yup.string()
-      .min(6, "Password must be at least 6 characters")
-      .required("Password is required"),
-    profile_pic: Yup.mixed().required("Profile picture is required"),
-  });
+  useEffect(() => {
+    if (error === null && data) {
+      toast.success("Verification email sent! Please verify before logging in.", {
+        duration: 3000, // To make the toast visible for 5 seconds
+      });
+      navigate('/auth');
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [error, loading]);
 
   // Submit Handler
   const handleSignup = async () => {
     setErrors({});
     try {
-      await validationSchema.validate(formData, { abortEarly: false });
+      const schema = Yup.object().shape({
+        name: Yup.string().required("Name is required"),
+        email: Yup.string()
+          .email("Invalid email")
+          .required("Email is required"),
+        password: Yup.string()
+          .min(6, "Password must be at least 6 characters")
+          .required("Password is required"),
+        profile_pic: Yup.mixed().required("Profile picture is required").optional(),
+      });
+
+      await schema.validate(formData, {abortEarly: false});
       await fnSignup();
     } catch (validationError) {
       const validationErrors = {};

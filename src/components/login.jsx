@@ -15,7 +15,7 @@ import Error from "./error";
 import { login } from "@/db/apiAuth";
 import { BeatLoader } from "react-spinners";
 import useFetch from "@/hooks/use-fetch";
-import { UrlState } from "@/context";
+// import {UrlState} from "@/context";
 
 const Login = () => {
   const [searchParams] = useSearchParams();
@@ -37,12 +37,11 @@ const Login = () => {
     }));
   };
 
-  const { loading, error, fn: fnLogin, data } = useFetch(login, formData);
-  const { fetchUser } = UrlState();
+  const {loading, error, fn: fnLogin, data} = useFetch(login, formData);
+  console.log(loading,error, data);
 
   useEffect(() => {
     if (error === null && data) {
-      fetchUser();
       navigate(`/dashboard?${longLink ? `createNew=${longLink}` : ""}`);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

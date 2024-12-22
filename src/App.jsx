@@ -1,6 +1,7 @@
 import "./index.css";
 import {RouterProvider, createBrowserRouter} from "react-router-dom";
 import UrlProvider from "./context";
+import { Toaster } from "react-hot-toast";
 
 import AppLayout from "./layouts/app-layout";
 import RequireAuth from "./components/require-auth";
@@ -51,6 +52,7 @@ const router = createBrowserRouter([
 function App() {
   return (
     <UrlProvider>
+      <Toaster/>
       <RouterProvider router={router} />
     </UrlProvider>
   );

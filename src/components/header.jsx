@@ -13,13 +13,11 @@ import {LinkIcon, LogOut} from "lucide-react";
 import {Link, useNavigate} from "react-router-dom";
 import {BarLoader} from "react-spinners";
 import {Button} from "./ui/button";
-import {UrlState} from "@/context";
 
 const Header = () => {
   const {loading, fn: fnLogout} = useFetch(logout);
   const navigate = useNavigate();
-
-  const {user, fetchUser} = UrlState();
+  const session = JSON.parse(localStorage.getItem("decodedToken"));
 
   return (
     <>
@@ -28,19 +26,19 @@ const Header = () => {
           <img src="/logo.png" className="h-16" alt="Trimrr Logo" />
         </Link>
         <div className="flex gap-4">
-          {!user ? (
+          {!session ? (
             <Button onClick={() => navigate("/auth")}>Login</Button>
           ) : (
             <DropdownMenu>
               <DropdownMenuTrigger className="w-10 rounded-full overflow-hidden">
                 <Avatar>
-                  <AvatarImage src={user?.user_metadata?.profile_pic} />
+                  <AvatarImage src={session.profile_pic} />
                   <AvatarFallback>PA</AvatarFallback>
                 </Avatar>
               </DropdownMenuTrigger>
               <DropdownMenuContent>
                 <DropdownMenuLabel>
-                  {user?.user_metadata?.name}
+                  {session.name}
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem>
@@ -52,7 +50,7 @@ const Header = () => {
                 <DropdownMenuItem
                   onClick={() => {
                     fnLogout().then(() => {
-                      fetchUser();
+                      // fetchUser();
                       navigate("/auth");
                     });
                   }}

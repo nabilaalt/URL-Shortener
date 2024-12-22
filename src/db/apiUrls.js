@@ -1,17 +1,19 @@
 import supabase, {supabaseUrl} from "./supabase";
+const URL_API = import.meta.env.VITE_API_URL;
+
 
 export async function getUrls(user_id) {
-  let {data, error} = await supabase
-    .from("urls")
-    .select("*")
-    .eq("user_id", user_id);
+  const response = await fetch(`${URL_API}/user/${user_id}/links`);
+  const data = await response.json();
 
-  if (error) {
-    console.error(error);
+  console.log(data)
+
+  if (!response.ok) {
+    console.error(data.error);
     throw new Error("Unable to load URLs");
   }
 
-  return data;
+  return data.links;
 }
 
 export async function getUrl({id, user_id}) {

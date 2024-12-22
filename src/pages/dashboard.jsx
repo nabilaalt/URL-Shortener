@@ -14,12 +14,13 @@ import useFetch from "@/hooks/use-fetch";
 
 import {getUrls} from "@/db/apiUrls";
 import {getClicksForUrls} from "@/db/apiClicks";
-import {UrlState} from "@/context";
+
 
 const Dashboard = () => {
   const [searchQuery, setSearchQuery] = useState("");
-  const {user} = UrlState();
-  const {loading, error, data: urls, fn: fnUrls} = useFetch(getUrls, user.id);
+  const session = JSON.parse(localStorage.getItem("decodedToken"));
+  console.log(session);
+  const {loading, error, data: urls, fn: fnUrls} = useFetch(getUrls, session.id);
   const {
     loading: loadingClicks,
     data: clicks,
@@ -31,7 +32,7 @@ const Dashboard = () => {
 
   useEffect(() => {
     fnUrls();
-  }, [fnUrls]);
+  }, []);
 
   const filteredUrls = urls?.filter((url) =>
     url.title.toLowerCase().includes(searchQuery.toLowerCase())
@@ -39,7 +40,8 @@ const Dashboard = () => {
 
   useEffect(() => {
     if (urls?.length) fnClicks();
-  }, [fnClicks, urls?.length]);
+  }, [urls]);
+
 
   return (
     <div className="flex flex-col gap-8">
