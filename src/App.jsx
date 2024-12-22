@@ -12,6 +12,7 @@ import Dashboard from "./pages/dashboard";
 import LinkPage from "./pages/link";
 import Auth from "./pages/auth";
 
+
 const router = createBrowserRouter([
   {
     element: <AppLayout />,

@@ -2,7 +2,15 @@ import {useEffect, useState} from "react";
 import {toast} from "react-hot-toast";
 import Error from "./error";
 import {Input} from "./ui/input";
+
 import * as Yup from "yup";
+import { signup } from "@/db/apiAuth";
+import useFetch from "@/hooks/use-fetch";
+import { BeatLoader } from "react-spinners";
+
+// UI Components
+import Error from "./error";
+import { Input } from "./ui/input";
 import {
   Card,
   CardContent,
@@ -11,6 +19,7 @@ import {
   CardHeader,
   CardTitle,
 } from "./ui/card";
+
 import {Button} from "./ui/button";
 import {useNavigate} from "react-router-dom";
 import {signup} from "@/db/apiAuth";
@@ -19,26 +28,29 @@ import useFetch from "@/hooks/use-fetch";
 
 const Signup = () => {
 
-
   const navigate = useNavigate();
+  const longLink = searchParams.get("createNew");
 
-  const [errors, setErrors] = useState({});
+  // State Management
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     password: "",
     profile_pic: null,
   });
+  const [errors, setErrors] = useState({});
 
-  const handleInputChange = (e) => {
-    const {name, value, files} = e.target;
+  // Custom hook for API call
+  const { loading, error, fn: fnSignup, data } = useFetch(signup, formData);
+
+  // Input Change Handler
+  const handleInputChange = useCallback((e) => {
+    const { name, value, files } = e.target;
     setFormData((prevState) => ({
       ...prevState,
       [name]: files ? files[0] : value,
     }));
-  };
-
-  const {loading, error, fn: fnSignup, data} = useFetch(signup, formData);
+  }, []);
 
   useEffect(() => {
     if (error === null && data) {
@@ -50,8 +62,9 @@ const Signup = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [error, loading]);
 
+  // Submit Handler
   const handleSignup = async () => {
-    setErrors([]);
+    setErrors({});
     try {
       const schema = Yup.object().shape({
         name: Yup.string().required("Name is required"),
@@ -66,74 +79,87 @@ const Signup = () => {
 
       await schema.validate(formData, {abortEarly: false});
       await fnSignup();
-    } catch (error) {
-      const newErrors = {};
-      if (error?.inner) {
-        error.inner.forEach((err) => {
-          newErrors[err.path] = err.message;
+    } catch (validationError) {
+      const validationErrors = {};
+      if (validationError?.inner) {
+        validationError.inner.forEach((err) => {
+          validationErrors[err.path] = err.message;
         });
-
-        setErrors(newErrors);
       } else {
-        setErrors({api: error.message});
+        validationErrors.api = validationError.message;
       }
+      setErrors(validationErrors);
     }
   };
+
+  // Navigate on Success
+  useEffect(() => {
+    if (!error && data) {
+      navigate(`/dashboard?${longLink ? `createNew=${longLink}` : ""}`);
+    }
+  }, [error, data, longLink, navigate]);
 
   return (
     <Card>
       <CardHeader>
         <CardTitle>Signup</CardTitle>
-        <CardDescription>
-          Create a new account if you haven&rsquo;t already
-        </CardDescription>
+        <CardDescription>Create a new account to get started</CardDescription>
         {error && <Error message={error?.message} />}
       </CardHeader>
-      <CardContent className="space-y-2">
-        <div className="space-y-1">
+
+      <CardContent className="space-y-4">
+        {/* Name Input */}
+        <div className="space-y-2">
           <Input
             name="name"
             type="text"
-            placeholder="Enter Name"
+            placeholder="Enter Your Name"
             onChange={handleInputChange}
+            value={formData.name}
           />
+          {errors.name && <Error message={errors.name} />}
         </div>
-        {errors.name && <Error message={errors.name} />}
-        <div className="space-y-1">
+
+        {/* Email Input */}
+        <div className="space-y-2">
           <Input
             name="email"
             type="email"
-            placeholder="Enter Email"
+            placeholder="Enter Your Email"
             onChange={handleInputChange}
+            value={formData.email}
           />
+          {errors.email && <Error message={errors.email} />}
         </div>
-        {errors.email && <Error message={errors.email} />}
-        <div className="space-y-1">
+
+        {/* Password Input */}
+        <div className="space-y-2">
           <Input
             name="password"
             type="password"
-            placeholder="Enter Password"
+            placeholder="Enter Your Password"
             onChange={handleInputChange}
+            value={formData.password}
           />
+          {errors.password && <Error message={errors.password} />}
         </div>
-        {errors.password && <Error message={errors.password} />}
-        <div className="space-y-1">
+
+        {/* Profile Picture Input */}
+        <div className="space-y-2">
+          <CardDescription>Set your profile picture:</CardDescription>
           <input
             name="profile_pic"
             type="file"
             accept="image/*"
             onChange={handleInputChange}
           />
+          {errors.profile_pic && <Error message={errors.profile_pic} />}
         </div>
-        {errors.profile_pic && <Error message={errors.profile_pic} />}
       </CardContent>
+
       <CardFooter>
-        <Button onClick={handleSignup}>
-          {loading ? (
-            <BeatLoader size={10} color="#36d7b7" />
-          ) : (
-            "Create Account"
-          )}
+        <Button onClick={handleSignup} disabled={loading}>
+          {loading ? <BeatLoader size={10} color="#36d7b7" /> : "Create Account"}
         </Button>
       </CardFooter>
     </Card>

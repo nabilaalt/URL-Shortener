@@ -91,6 +91,22 @@ export async function signup({ name, email, password, profile_pic }) {
   return data; // Return the data received from the external API
 }
 
+export async function resetPassword({ email }) {
+  const { error } = await supabase.auth.api.resetPasswordForEmail(email);
+
+  if (error) throw new Error(error.message);
+
+  return { message: 'Password reset email sent successfully.' };
+}
+
+export async function sendVerificationEmail({ email }) {
+  const { error } = await supabase.auth.api.sendPasswordResetEmail(email);
+
+  if (error) throw new Error(error.message);
+
+  return { message: "Verification email sent." };
+}
+
 export async function getCurrentUser() {
   const { data: session, error } = await supabase.auth.getSession();
   if (!session.session) return null;

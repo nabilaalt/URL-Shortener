@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import {storeClicks} from "@/db/apiClicks";
 import {getLongUrl} from "@/db/apiUrls";
 import useFetch from "@/hooks/use-fetch";
@@ -16,17 +17,16 @@ const RedirectLink = () => {
   });
 
   useEffect(() => {
-    fn();
-  }, []);
-
+    if (!data) fn(); // Fetch hanya sekali
+  }, [data]);
+  
   useEffect(() => {
-    if (!loading && data) {
+    if (!loading && data && !loadingStats) {
       fnStats();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [loading]);
-
-  if (loading || loadingStats) {
+  }, [loading, data, loadingStats]);
+  
+  if (loading || loadingStats || !data) {
     return (
       <>
         <BarLoader width={"100%"} color="#36d7b7" />
