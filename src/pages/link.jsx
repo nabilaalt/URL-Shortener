@@ -1,18 +1,18 @@
 /* eslint-disable react-hooks/exhaustive-deps */
+import DailyClicks from "@/components/daily-click";
 import DeviceStats from "@/components/device-stats";
 import Location from "@/components/location-stats";
-import {Button} from "@/components/ui/button";
-import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
-import {getClicksForUrl} from "@/db/apiClicks";
-import {deleteUrl, getUrl} from "@/db/apiUrls";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { getClicksForUrl } from "@/db/apiClicks";
+import { deleteUrl, getUrl } from "@/db/apiUrls";
 import useFetch from "@/hooks/use-fetch";
-import {Copy, Download, LinkIcon, Trash} from "lucide-react";
-import {useEffect} from "react";
-import {useNavigate, useParams} from "react-router-dom";
-import {BarLoader, BeatLoader} from "react-spinners";
+import { Copy, Download, LinkIcon, Trash } from "lucide-react";
+import { useEffect } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import { BarLoader, BeatLoader } from "react-spinners";
 
-const URL_API = import.meta.env.VITE_API_URL;
-
+const URL_APP = import.meta.env.VITE_APP_URL;
 const LinkPage = () => {
   const downloadImage = () => {
     const imageUrl = url?.qr;
@@ -62,11 +62,11 @@ const LinkPage = () => {
             {url?.title || "Loading..."}
           </span>
           <a
-            href={`https://trimrr.in/${link}`}
+            href={`${URL_APP}/${link}`}
             target="_blank"
             className="text-3xl sm:text-4xl text-blue-400 font-bold hover:underline cursor-pointer"
           >
-            {URL_API}/{link || "Loading..."}
+            {URL_APP}/{link || "Loading..."}
           </a>
           <a
             href={url?.originalUrl || "#"}
@@ -83,7 +83,7 @@ const LinkPage = () => {
             <Button
               variant="ghost"
               onClick={() =>
-                navigator.clipboard.writeText(`https://trimrr.in/${link}`)
+                navigator.clipboard.writeText(`${URL_APP}/${link}`)
               }
             >
               <Copy />
@@ -118,17 +118,70 @@ const LinkPage = () => {
           <CardHeader>
             <CardTitle className="text-4xl font-extrabold">Stats</CardTitle>
           </CardHeader>
-          {stats && stats.length ? (
+          {stats ? (
             <CardContent className="flex flex-col gap-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Total Clicks</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p>{stats?.length}</p>
-                </CardContent>
-              </Card>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                {/* Total Clicks */}
+                <Card className="p-4 shadow-md border border-gray-300 rounded-md">
+                  <CardHeader>
+                    <CardTitle>Total Clicks</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-xl font-semibold">
+                      {stats?.total_clicks || 0}
+                    </p>
+                  </CardContent>
+                </Card>
 
+                {/* Daily Clicks */}
+                <Card className="p-4 shadow-md border border-gray-300 rounded-md">
+                  <CardHeader>
+                    <CardTitle>Daily Clicks</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-xl font-semibold">
+                      {stats?.daily_clicks[
+                        new Date().toISOString().split("T")[0]
+                      ]?.clicks || 0}
+                    </p>
+                  </CardContent>
+                </Card>
+
+                {/* Weekly Clicks */}
+                <Card className="p-4 shadow-md border border-gray-300 rounded-md">
+                  <CardHeader>
+                    <CardTitle>Weekly Clicks</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-xl font-semibold">
+                      {stats?.weekly_clicks[
+                        `2024-W${Math.ceil(new Date().getDate() / 7)}`
+                      ]?.clicks || 0}
+                    </p>
+                  </CardContent>
+                </Card>
+
+                {/* Monthly Clicks */}
+                <Card className="p-4 shadow-md border border-gray-300 rounded-md">
+                  <CardHeader>
+                    <CardTitle>Monthly Clicks</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-xl font-semibold">
+                      {stats?.monthly_clicks[
+                        new Date()
+                          .toISOString()
+                          .split("-")
+                          .slice(0, 2)
+                          .join("-")
+                      ]?.clicks || 0}
+                    </p>
+                  </CardContent>
+                </Card>
+              </div>
+
+              <CardTitle>Daily Clicks Tren</CardTitle>
+              <DailyClicks stats={stats} />
               <CardTitle>Location Data</CardTitle>
               <Location stats={stats} />
               <CardTitle>Device Info</CardTitle>

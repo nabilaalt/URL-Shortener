@@ -11,6 +11,7 @@ import LandingPage from "./pages/landing";
 import Dashboard from "./pages/dashboard";
 import LinkPage from "./pages/link";
 import Auth from "./pages/auth";
+import ResetPassword from "./components/reset-pass";
 
 
 const router = createBrowserRouter([
@@ -45,6 +46,10 @@ const router = createBrowserRouter([
         path: "/:id",
         element: <RedirectLink />,
       },
+      {
+        path : "/forgot-password",
+        element : <ResetPassword />
+      }
     ],
   },
 ]);

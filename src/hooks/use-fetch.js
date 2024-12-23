@@ -1,26 +1,25 @@
-import { useState, useCallback } from "react";
+import {useState} from "react";
 
-const useFetch = (apiFunction, params) => {
-  const [loading, setLoading] = useState(false);
+const useFetch = (cb, options = {}) => {
   const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(null);
   const [error, setError] = useState(null);
 
-  // Fetch function
-  const fn = useCallback(async () => {
+  const fn = async (...args) => {
     setLoading(true);
     setError(null);
     try {
-      const response = await apiFunction(params); // Fetch API data
-      setData(response); // Update data state
-    } catch (err) {
-      setError(err); // Update error state
+      const response = await cb(options, ...args);
+      setData(response);
+      setError(null);
+    } catch (error) {
+      setError(error);
     } finally {
-      setLoading(false); // Stop loading
+      setLoading(false);
     }
   };
 
-
-  return { loading, data, error, fn };
+  return {data, loading, error, fn};
 };
 
 export default useFetch;

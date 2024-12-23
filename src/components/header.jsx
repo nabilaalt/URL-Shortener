@@ -50,8 +50,7 @@ const Header = () => {
                 <DropdownMenuItem
                   onClick={() => {
                     fnLogout().then(() => {
-                      // fetchUser();
-                      navigate("/auth");
+                      navigate("/auth"); // Redirect after logout is complete
                     });
                   }}
                   className="text-red-400"

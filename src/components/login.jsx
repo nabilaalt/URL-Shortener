@@ -15,11 +15,14 @@ import Error from "./error";
 import { login } from "@/db/apiAuth";
 import { BeatLoader } from "react-spinners";
 import useFetch from "@/hooks/use-fetch";
+import * as jose from "jose";
 // import {UrlState} from "@/context";
+const URL_API = import.meta.env.VITE_API_URL;
 
 const Login = () => {
   const [searchParams] = useSearchParams();
   const longLink = searchParams.get("createNew");
+  const token = searchParams.get("token");
 
   const navigate = useNavigate();
 
@@ -46,6 +49,31 @@ const Login = () => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [error, data]);
+
+  useEffect(() => {
+    const verifyToken = async () => {
+      if (token) {
+        // Save token to localStorage
+        console.log(token)
+        const jwtSecret = new TextEncoder().encode(
+          "b41897f961525dd71bdf8bdf7fd1a9ab627e5eebd26ba3cd5d75c04b1921bc9d"
+        ); // Replace with your actual secret
+        const { payload: decoded } = await jose.jwtVerify(token, jwtSecret);
+        console.log(decoded);
+        // Store the decoded token in cache (localStorage in this case)
+        localStorage.setItem("decodedToken", JSON.stringify(decoded));
+
+        // Redirect to the dashboard or specific page
+        navigate(`/dashboard?${longLink ? `createNew=${longLink}` : ""}`);
+      }
+
+      if (error === null && data) {
+        navigate(`/dashboard?${longLink ? `createNew=${longLink}` : ""}`);
+      }
+    };
+
+    verifyToken();
+  }, [error, data, token, longLink, navigate]);
 
   const handleLogin = async () => {
     setErrors([]);
@@ -114,7 +142,7 @@ const Login = () => {
   </Button>
 
   <Button 
-    onClick={() => console.log('Login with Google clicked')} 
+    onClick={() => {window.location.href = `${URL_API}/auth/google`;}} 
     disabled={loading}
     className="w-full flex items-center justify-center bg-white border border-gray-300 text-gray-700 hover:bg-gray-200">
     <img 
@@ -127,7 +155,7 @@ const Login = () => {
 </CardFooter>
 <div className="flex justify-end w-full pr-6">
     <button 
-      onClick={() => console.log("Forgot your password?")} 
+      onClick={() => navigate('/forgot-password')} 
       disabled={loading}
       className="text-sm text-blue-400 hover:underline pb-6">
       Forgot your password?

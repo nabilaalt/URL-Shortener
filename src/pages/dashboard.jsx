@@ -1,36 +1,37 @@
 // can add sonner from shadcn ui after link created
 
-import {useEffect, useState} from "react";
-import {BarLoader} from "react-spinners";
-import {Filter} from "lucide-react";
+import { useEffect, useState } from "react";
+import { BarLoader } from "react-spinners";
+import { Filter } from "lucide-react";
 
-import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
-import {Input} from "@/components/ui/input";
-import {CreateLink} from "@/components/create-link";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { CreateLink } from "@/components/create-link";
 import LinkCard from "@/components/link-card";
 import Error from "@/components/error";
 
 import useFetch from "@/hooks/use-fetch";
 
-import {getUrls} from "@/db/apiUrls";
-import {getClicksForUrls} from "@/db/apiClicks";
-
+import { getUrls } from "@/db/apiUrls";
+import { getClicksForUrls } from "@/db/apiClicks";
 
 const Dashboard = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [urls, setUrls] = useState([]);
   const session = JSON.parse(localStorage.getItem("decodedToken"));
-  const {loading, error, data: fetchedUrls, fn: fnUrls} = useFetch(getUrls, session.id);
+  const {
+    loading,
+    error,
+    data: fetchedUrls,
+    fn: fnUrls,
+  } = useFetch(getUrls, session.id);
   const {
     loading: loadingClicks,
     data: clicks,
     fn: fnClicks,
-  } = useFetch(
-    getClicksForUrls,
-    urls?.map((url) => url.id)
-  );
+  } = useFetch(getClicksForUrls);
 
-  useEffect(() => { 
+  useEffect(() => {
     fnUrls();
   }, []);
 
@@ -44,7 +45,6 @@ const Dashboard = () => {
     setUrls((prevUrls) => [newUrl, ...prevUrls]);
   };
 
-
   const filteredUrls = urls?.filter((url) =>
     url.title.toLowerCase().includes(searchQuery.toLowerCase())
   );
@@ -52,7 +52,6 @@ const Dashboard = () => {
   useEffect(() => {
     if (urls?.length) fnClicks();
   }, [urls]);
-
 
   return (
     <div className="flex flex-col gap-8">
@@ -73,7 +72,7 @@ const Dashboard = () => {
             <CardTitle>Total Clicks</CardTitle>
           </CardHeader>
           <CardContent>
-            <p>{clicks?.length}</p>
+            <p>{clicks?.total_clicks}</p>
           </CardContent>
         </Card>
       </div>

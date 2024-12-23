@@ -110,6 +110,15 @@ export async function getCurrentUser() {
 }
 
 export async function logout() {
-  const { error } = await supabase.auth.signOut();
-  if (error) throw new Error(error.message);
+  return new Promise((resolve) => {
+    // Remove the decoded token from localStorage
+    localStorage.removeItem("decodedToken");
+
+    // Optional delay to ensure smooth execution
+    setTimeout(() => {
+      resolve({ success: true }); // Simulate a success response
+    }, 0);
+  });
 }
+
+

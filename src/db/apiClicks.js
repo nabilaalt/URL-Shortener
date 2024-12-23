@@ -1,32 +1,29 @@
 import {UAParser} from "ua-parser-js";
 import supabase from "./supabase";
+const URL_API = import.meta.env.VITE_API_URL;
 
-export async function getClicksForUrls(urlIds) {
-  const {data, error} = await supabase
-    .from("clicks")
-    .select("*")
-    .in("url_id", urlIds);
+export async function getClicksForUrls() {
+  try {
+    const response = await fetch(`${URL_API}/stats/total`);
+    const data = await response.json();
 
-  if (error) {
+    console.log(data)
+    return data;
+  } catch (error) {
     console.error("Error fetching clicks:", error);
     return null;
   }
-
-  return data;
 }
 
 export async function getClicksForUrl(url_id) {
-  const {data, error} = await supabase
-    .from("clicks")
-    .select("*")
-    .eq("url_id", url_id);
-
-  if (error) {
-    console.error(error);
+  try {
+    const response = await fetch(`${URL_API}/stats/${url_id}`);
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error fetching clicks:", error);
     throw new Error("Unable to load Stats");
   }
-
-  return data;
 }
 
 const parser = new UAParser();

@@ -1,4 +1,4 @@
-import {useEffect, useState} from "react";
+import {useEffect, useState, useCallback} from "react";
 import {toast} from "react-hot-toast";
 import Error from "./error";
 import {Input} from "./ui/input";
@@ -9,8 +9,6 @@ import useFetch from "@/hooks/use-fetch";
 import { BeatLoader } from "react-spinners";
 
 // UI Components
-import Error from "./error";
-import { Input } from "./ui/input";
 import {
   Card,
   CardContent,
@@ -22,14 +20,10 @@ import {
 
 import {Button} from "./ui/button";
 import {useNavigate} from "react-router-dom";
-import {signup} from "@/db/apiAuth";
-import {BeatLoader} from "react-spinners";
-import useFetch from "@/hooks/use-fetch";
 
 const Signup = () => {
 
   const navigate = useNavigate();
-  const longLink = searchParams.get("createNew");
 
   // State Management
   const [formData, setFormData] = useState({
@@ -50,7 +44,7 @@ const Signup = () => {
       ...prevState,
       [name]: files ? files[0] : value,
     }));
-  }, []);
+  }, []); 
 
   useEffect(() => {
     if (error === null && data) {
@@ -92,12 +86,6 @@ const Signup = () => {
     }
   };
 
-  // Navigate on Success
-  useEffect(() => {
-    if (!error && data) {
-      navigate(`/dashboard?${longLink ? `createNew=${longLink}` : ""}`);
-    }
-  }, [error, data, longLink, navigate]);
 
   return (
     <Card>

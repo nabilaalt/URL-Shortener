@@ -44,6 +44,7 @@ export async function getLongUrl(id) {
 export async function createUrl({title, longUrl, customUrl, userId}, qrcode) {
   const shortUrl = Math.random().toString(36).substring(2, 8);
   const fileName = `qr-${shortUrl}`;
+  console.log(qrcode)
 
   const {error: storageError} = await supabase.storage
     .from("shortener-API")
@@ -56,6 +57,7 @@ export async function createUrl({title, longUrl, customUrl, userId}, qrcode) {
     .getPublicUrl(`qrs/${fileName}`);
 
   const publicURL = publicData.publicUrl; // Properly access the public URL
+  console.log(`Public URL: ${publicURL}`);
 
   if (urlError) throw new Error(urlError.message);
   const requestData = {
