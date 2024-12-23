@@ -1,4 +1,4 @@
-import supabase, {supabaseUrl} from "./supabase";
+import supabase from "./supabase";
 const URL_API = import.meta.env.VITE_API_URL;
 
 
@@ -6,7 +6,6 @@ export async function getUrls(user_id) {
   const response = await fetch(`${URL_API}/user/${user_id}/links`);
   const data = await response.json();
 
-  console.log(data)
 
   if (!response.ok) {
     console.error(data.error);
@@ -16,17 +15,12 @@ export async function getUrls(user_id) {
   return data.links;
 }
 
-export async function getUrl({id, user_id}) {
-  const {data, error} = await supabase
-    .from("urls")
-    .select("*")
-    .eq("id", id)
-    .eq("user_id", user_id)
-    .single();
-
-  if (error) {
-    console.error(error);
-    throw new Error("Short Url not found");
+export async function getUrl({id}) {
+  const response = await fetch(`${URL_API}/shortener/${id}`);
+  const data = await response.json();
+  if (!response.ok) {
+    console.error(data.error);
+    throw new Error(data.error || "Error fetching URL");
   }
 
   return data;
@@ -47,46 +41,62 @@ export async function getLongUrl(id) {
   return shortLinkData;
 }
 
-export async function createUrl({title, longUrl, customUrl, user_id}, qrcode) {
-  const short_url = Math.random().toString(36).substr(2, 6);
-  const fileName = `qr-${short_url}`;
+export async function createUrl({title, longUrl, customUrl, userId}, qrcode) {
+  const shortUrl = Math.random().toString(36).substring(2, 8);
+  const fileName = `qr-${shortUrl}`;
 
   const {error: storageError} = await supabase.storage
-    .from("qrs")
-    .upload(fileName, qrcode);
+    .from("shortener-API")
+    .upload(`qrs/${fileName}`, qrcode);
 
   if (storageError) throw new Error(storageError.message);
 
-  const qr = `${supabaseUrl}/storage/v1/object/public/qrs/${fileName}`;
+  const { data: publicData, error: urlError } = supabase.storage
+    .from("shortener-API")
+    .getPublicUrl(`qrs/${fileName}`);
 
-  const {data, error} = await supabase
-    .from("urls")
-    .insert([
-      {
-        title,
-        user_id,
-        original_url: longUrl,
-        custom_url: customUrl || null,
-        short_url,
-        qr,
-      },
-    ])
-    .select();
+  const publicURL = publicData.publicUrl; // Properly access the public URL
 
-  if (error) {
-    console.error(error);
-    throw new Error("Error creating short URL");
+  if (urlError) throw new Error(urlError.message);
+  const requestData = {
+    title,
+    userId,
+    originalUrl: longUrl,
+    customUrl,
+    shortUrl,
+    qr: publicURL,
+  };
+
+  const response = await fetch(`${URL_API}/shortener`, {
+    method: 'POST',
+    headers: {
+      "Content-Type": "application/json", // Set the content type to JSON
+    },
+    body: JSON.stringify(requestData)
+  });
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    console.error(data.error);
+    throw new Error(data.error || "Error creating short URL");
   }
-
-  return data;
+  return data.link;
 }
 
 export async function deleteUrl(id) {
-  const {data, error} = await supabase.from("urls").delete().eq("id", id);
+  const response = await fetch(`${URL_API}/shortener/${id}`, {
+    method: 'DELETE',
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
 
-  if (error) {
-    console.error(error);
-    throw new Error("Unable to delete Url");
+  const data = await response.json();
+
+  if (!response.ok) {
+    console.error(data.error);
+    throw new Error(data.error || "Error deleting URL");
   }
 
   return data;

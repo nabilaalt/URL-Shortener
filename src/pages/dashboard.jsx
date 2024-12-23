@@ -18,9 +18,9 @@ import {getClicksForUrls} from "@/db/apiClicks";
 
 const Dashboard = () => {
   const [searchQuery, setSearchQuery] = useState("");
+  const [urls, setUrls] = useState([]);
   const session = JSON.parse(localStorage.getItem("decodedToken"));
-  console.log(session);
-  const {loading, error, data: urls, fn: fnUrls} = useFetch(getUrls, session.id);
+  const {loading, error, data: fetchedUrls, fn: fnUrls} = useFetch(getUrls, session.id);
   const {
     loading: loadingClicks,
     data: clicks,
@@ -30,9 +30,20 @@ const Dashboard = () => {
     urls?.map((url) => url.id)
   );
 
-  useEffect(() => {
+  useEffect(() => { 
     fnUrls();
   }, []);
+
+  useEffect(() => {
+    if (fetchedUrls) {
+      setUrls(fetchedUrls);
+    }
+  }, [fetchedUrls]);
+
+  const handleNewUrl = (newUrl) => {
+    setUrls((prevUrls) => [newUrl, ...prevUrls]);
+  };
+
 
   const filteredUrls = urls?.filter((url) =>
     url.title.toLowerCase().includes(searchQuery.toLowerCase())
@@ -68,7 +79,7 @@ const Dashboard = () => {
       </div>
       <div className="flex justify-between">
         <h1 className="text-4xl font-extrabold">My Links</h1>
-        <CreateLink />
+        <CreateLink onNewUrl={handleNewUrl} />
       </div>
       <div className="relative">
         <Input

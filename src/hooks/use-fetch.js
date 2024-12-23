@@ -17,7 +17,8 @@ const useFetch = (apiFunction, params) => {
     } finally {
       setLoading(false); // Stop loading
     }
-  }, [apiFunction, params]);
+  };
+
 
   return { loading, data, error, fn };
 };

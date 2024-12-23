@@ -1,4 +1,4 @@
-import supabase, { supabaseUrl } from "./supabase";
+import supabase from "./supabase";
 import * as jose from "jose";
 
 
@@ -53,20 +53,27 @@ export async function signup({ name, email, password, profile_pic }) {
 
   // Upload the profile picture to Supabase storage
   const { error: storageError } = await supabase.storage
-    .from("profile_pic")
-    .upload(fileName, profile_pic);
+    .from("shortener-API")
+    .upload(`profile_pic/${fileName}`, profile_pic);
 
   if (storageError) throw new Error(storageError.message);
 
-  // Build the URL for the profile picture stored in Supabase
-  const profilePicUrl = `${supabaseUrl}/storage/v1/object/public/profile_pic/${fileName}`;
+  // Get the public URL for the uploaded profile picture
+  const { data: publicData, error: urlError } = supabase.storage
+    .from("shortener-API")
+    .getPublicUrl(`profile_pic/${fileName}`);
+
+  if (urlError) throw new Error(urlError.message);
+
+  const publicURL = publicData.publicUrl; // Properly access the public URL
+  console.log(publicURL);
 
   // Prepare the data to send to the external API
   const requestData = {
     name,
     email,
     password,
-    profile_pic : profilePicUrl
+    profile_pic: publicURL,
   };
 
   // Send the data to the external API via POST request
@@ -91,21 +98,6 @@ export async function signup({ name, email, password, profile_pic }) {
   return data; // Return the data received from the external API
 }
 
-export async function resetPassword({ email }) {
-  const { error } = await supabase.auth.api.resetPasswordForEmail(email);
-
-  if (error) throw new Error(error.message);
-
-  return { message: 'Password reset email sent successfully.' };
-}
-
-export async function sendVerificationEmail({ email }) {
-  const { error } = await supabase.auth.api.sendPasswordResetEmail(email);
-
-  if (error) throw new Error(error.message);
-
-  return { message: "Verification email sent." };
-}
 
 export async function getCurrentUser() {
   const { data: session, error } = await supabase.auth.getSession();

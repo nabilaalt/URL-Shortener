@@ -3,7 +3,6 @@ import DeviceStats from "@/components/device-stats";
 import Location from "@/components/location-stats";
 import {Button} from "@/components/ui/button";
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
-import {UrlState} from "@/context";
 import {getClicksForUrl} from "@/db/apiClicks";
 import {deleteUrl, getUrl} from "@/db/apiUrls";
 import useFetch from "@/hooks/use-fetch";
@@ -12,35 +11,24 @@ import {useEffect} from "react";
 import {useNavigate, useParams} from "react-router-dom";
 import {BarLoader, BeatLoader} from "react-spinners";
 
+const URL_API = import.meta.env.VITE_API_URL;
+
 const LinkPage = () => {
   const downloadImage = () => {
     const imageUrl = url?.qr;
     const fileName = url?.title;
 
-    // Create an anchor element
     const anchor = document.createElement("a");
     anchor.href = imageUrl;
     anchor.download = fileName;
-  
 
-    // Append the anchor to the body
     document.body.appendChild(anchor);
-
-    // Trigger the download by simulating a click event
     anchor.click();
-
-    // Remove the anchor from the document
     document.body.removeChild(anchor);
   };
   const navigate = useNavigate();
-  const {user} = UrlState();
-  const {id} = useParams();
-  const {
-    loading,
-    data: url,
-    fn,
-    error,
-  } = useFetch(getUrl, {id, user_id: user?.id});
+  const { id } = useParams();
+  const { loading, data: url, fn, error } = useFetch(getUrl, { id });
 
   const {
     loading: loadingStats,
@@ -48,28 +36,19 @@ const LinkPage = () => {
     fn: fnStats,
   } = useFetch(getClicksForUrl, id);
 
-  const {loading: loadingDelete, fn: fnDelete} = useFetch(deleteUrl, id);
+  const { loading: loadingDelete, fn: fnDelete } = useFetch(deleteUrl, id);
 
   useEffect(() => {
     if (!url) fn(); // Fetch hanya sekali
   }, [url]);
 
   useEffect(() => {
-    if (!error && loading === false && url && !loadingStats) {
-      fnStats();
-    }
-  }, [loading, error, url, loadingStats]);
-  
-  if (loading || !url) {
-    return <BarLoader width={"100%"} color="#36d7b7" />;
-  }
-  if (error) {
-    navigate("/dashboard");
-  }
+    if (!error && loading === false) fnStats();
+  }, [loading, error]);
 
   let link = "";
   if (url) {
-    link = url?.custom_url ? url?.custom_url : url.short_url;
+    link = url?.shortUrl;
   }
 
   return (
@@ -80,25 +59,25 @@ const LinkPage = () => {
       <div className="flex flex-col gap-8 sm:flex-row justify-between">
         <div className="flex flex-col items-start gap-8 rounded-lg sm:w-2/5">
           <span className="text-6xl font-extrabold hover:underline cursor-pointer">
-            {url?.title}
+            {url?.title || "Loading..."}
           </span>
           <a
             href={`https://trimrr.in/${link}`}
             target="_blank"
             className="text-3xl sm:text-4xl text-blue-400 font-bold hover:underline cursor-pointer"
           >
-            https://trimrr.in/{link}
+            {URL_API}/{link || "Loading..."}
           </a>
           <a
-            href={url?.original_url}
+            href={url?.originalUrl || "#"}
             target="_blank"
             className="flex items-center gap-1 hover:underline cursor-pointer"
           >
             <LinkIcon className="p-1" />
-            {url?.original_url}
+            {url?.originalUrl || "Loading..."}
           </a>
           <span className="flex items-end font-extralight text-sm">
-            {new Date(url?.created_at).toLocaleString()}
+            {url ? new Date(url?.createdAt).toLocaleString() : "Loading..."}
           </span>
           <div className="flex gap-2">
             <Button
@@ -129,7 +108,7 @@ const LinkPage = () => {
             </Button>
           </div>
           <img
-            src={url?.qr}
+            src={url?.qr || "placeholder-image-url"}
             className="w-full self-center sm:self-start ring ring-blue-500 p-1 object-contain"
             alt="qr code"
           />
