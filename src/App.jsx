@@ -6,7 +6,6 @@ import { Toaster } from "react-hot-toast";
 import AppLayout from "./layouts/app-layout";
 import RequireAuth from "./components/require-auth";
 
-import RedirectLink from "./pages/redirect-link";
 import LandingPage from "./pages/landing";
 import Dashboard from "./pages/dashboard";
 import LinkPage from "./pages/link";
@@ -41,10 +40,6 @@ const router = createBrowserRouter([
             <LinkPage />
           </RequireAuth>
         ),
-      },
-      {
-        path: "/:id",
-        element: <RedirectLink />,
       },
       {
         path : "/forgot-password",

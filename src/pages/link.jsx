@@ -51,6 +51,8 @@ const LinkPage = () => {
     link = url?.shortUrl;
   }
 
+  console.log(stats);
+
   return (
     <>
       {(loading || loadingStats) && (
@@ -118,7 +120,9 @@ const LinkPage = () => {
           <CardHeader>
             <CardTitle className="text-4xl font-extrabold">Stats</CardTitle>
           </CardHeader>
-          {stats ? (
+          {stats && stats?.message === "No clicks yet" ? (
+            <CardContent>No Statistics Yet</CardContent>
+          ) : stats ? (
             <CardContent className="flex flex-col gap-6">
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 {/* Total Clicks */}
@@ -140,7 +144,7 @@ const LinkPage = () => {
                   </CardHeader>
                   <CardContent>
                     <p className="text-xl font-semibold">
-                      {stats?.daily_clicks[
+                      {stats?.daily_clicks?.[
                         new Date().toISOString().split("T")[0]
                       ]?.clicks || 0}
                     </p>
@@ -154,7 +158,7 @@ const LinkPage = () => {
                   </CardHeader>
                   <CardContent>
                     <p className="text-xl font-semibold">
-                      {stats?.weekly_clicks[
+                      {stats?.weekly_clicks?.[
                         `2024-W${Math.ceil(new Date().getDate() / 7)}`
                       ]?.clicks || 0}
                     </p>
@@ -168,7 +172,7 @@ const LinkPage = () => {
                   </CardHeader>
                   <CardContent>
                     <p className="text-xl font-semibold">
-                      {stats?.monthly_clicks[
+                      {stats?.monthly_clicks?.[
                         new Date()
                           .toISOString()
                           .split("-")
@@ -180,7 +184,7 @@ const LinkPage = () => {
                 </Card>
               </div>
 
-              <CardTitle>Daily Clicks Tren</CardTitle>
+              <CardTitle>Daily Clicks Trend</CardTitle>
               <DailyClicks stats={stats} />
               <CardTitle>Location Data</CardTitle>
               <Location stats={stats} />
@@ -190,8 +194,8 @@ const LinkPage = () => {
           ) : (
             <CardContent>
               {loadingStats === false
-                ? "No Statistics yet"
-                : "Loading Statistics.."}
+                ? "No Statistics Yet"
+                : "Loading Statistics..."}
             </CardContent>
           )}
         </Card>
