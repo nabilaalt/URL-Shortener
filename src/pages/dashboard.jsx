@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 // can add sonner from shadcn ui after link created
 
 import { useEffect, useState } from "react";
@@ -54,7 +55,7 @@ const Dashboard = () => {
   }, [urls]);
 
   return (
-    <div className="flex flex-col gap-8">
+    <div className="flex flex-col gap-8 sm p-5">
       {(loading || loadingClicks) && (
         <BarLoader width={"100%"} color="#36d7b7" />
       )}
@@ -76,8 +77,8 @@ const Dashboard = () => {
           </CardContent>
         </Card>
       </div>
-      <div className="flex justify-between">
-        <h1 className="text-4xl font-extrabold">My Links</h1>
+      <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
+        <h1 className="text-2xl sm:text-4xl font-extrabold">My Links</h1>
         <CreateLink onNewUrl={handleNewUrl} />
       </div>
       <div className="relative">

@@ -3,8 +3,10 @@ import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/componen
 import { Input } from "@/components/ui/input"; 
 import { Button } from "@/components/ui/button"; 
 import { BeatLoader } from "react-spinners"; 
-import { useNavigate} from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+
 const URL_API = import.meta.env.VITE_API_URL;
+
 // Fungsi untuk mengirim email verifikasi
 const sendVerification = async (email) => {
   try {
@@ -36,7 +38,6 @@ const ResetPassword = () => {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
-  // const [verificationSent, setVerificationSent] = useState(false); 
   const [sendingVerification, setSendingVerification] = useState(false); 
   const [token, setToken] = useState(null); // Token state
 
@@ -102,7 +103,7 @@ const ResetPassword = () => {
 
       if (response.ok) {
         setMessage(data.message || "Password reset successfully.");
-        navigate('/auth')
+        navigate('/auth');
       } else {
         setError(data.message || "Failed to reset password.");
       }
@@ -114,12 +115,16 @@ const ResetPassword = () => {
   };
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>{token ? "Change Your Password" : "Forgot Password"}</CardTitle>
-      </CardHeader>
+<div className="mt-20 flex flex-col items-center gap-10 px-6 sm:px-8 lg:px-0">
+  <Card className="max-w-md w-full mx-auto">
+    <CardHeader>
+      <CardTitle className="text-center">{token ? "Change Your Password" : "Forgot Password"}
 
-      <CardContent>
+      </CardTitle>
+    </CardHeader>
+
+    <CardContent className="space-y-5">
+      <div className="space-y-2">
         {!token ? (
           <>
             <Input
@@ -152,28 +157,31 @@ const ResetPassword = () => {
             {message && <div className="text-green-500 text-sm">{message}</div>}
           </>
         )}
-      </CardContent>
+      </div>
+    </CardContent>
 
-      <CardFooter>
-        {!token ? (
-          <Button onClick={handleSendVerification} disabled={sendingVerification}>
-            {sendingVerification ? (
-              <BeatLoader size={10} color="#36d7b7" />
-            ) : (
-              "Send Verification Email"
-            )}
-          </Button>
-        ) : (
-          <Button onClick={handleResetPassword} disabled={loading}>
-            {loading ? (
-              <BeatLoader size={10} color="#36d7b7" />
-            ) : (
-              "Reset Password"
-            )}
-          </Button>
-        )}
-      </CardFooter>
-    </Card>
+    <CardFooter>
+      {!token ? (
+        <Button onClick={handleSendVerification} disabled={sendingVerification} variant="destructive" className="w-full">
+          {sendingVerification ? (
+            <BeatLoader size={10} color="#36d7b7" />
+          ) : (
+            "Send Verification Email"
+          )}
+        </Button>
+      ) : (
+        <Button onClick={handleResetPassword} disabled={loading} variant="destructive" className="w-full">
+          {loading ? (
+            <BeatLoader size={10} color="#36d7b7" />
+          ) : (
+            "Reset Password"
+          )}
+        </Button>
+      )}
+    </CardFooter>
+  </Card>
+</div>
+
   );
 };
 

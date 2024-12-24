@@ -93,6 +93,7 @@ export function CreateLink({ onNewUrl }) {
     }
     
    
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [error, loading]);
 
   console.log("loading :", loading)
@@ -125,12 +126,12 @@ export function CreateLink({ onNewUrl }) {
         {errors.title && <Error message={errors.title} />}
         <Input
           id="longUrl"
-          placeholder="Enter your Loooong URL"
+          placeholder="Enter your Long URL"
           value={formValues.longUrl}
           onChange={handleChange}
         />
         {errors.longUrl && <Error message={errors.longUrl} />}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 bg-rose-500">
           <Card className="p-2">shortener.api</Card> /
           <Input
             id="customUrl"
