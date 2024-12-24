@@ -13,7 +13,8 @@ const UrlProvider = ({children}) => {
 
   useEffect(() => {
     fetchUser();
-  }, [fetchUser]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <UrlContext.Provider value={{user, fetchUser, loading, isAuthenticated}}>

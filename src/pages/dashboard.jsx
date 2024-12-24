@@ -1,37 +1,50 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 // can add sonner from shadcn ui after link created
 
-import {useEffect, useState} from "react";
-import {BarLoader} from "react-spinners";
-import {Filter} from "lucide-react";
+import { useEffect, useState } from "react";
+import { BarLoader } from "react-spinners";
+import { Filter } from "lucide-react";
 
-import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
-import {Input} from "@/components/ui/input";
-import {CreateLink} from "@/components/create-link";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { CreateLink } from "@/components/create-link";
 import LinkCard from "@/components/link-card";
 import Error from "@/components/error";
 
 import useFetch from "@/hooks/use-fetch";
 
-import {getUrls} from "@/db/apiUrls";
-import {getClicksForUrls} from "@/db/apiClicks";
-import {UrlState} from "@/context";
+import { getUrls } from "@/db/apiUrls";
+import { getClicksForUrls } from "@/db/apiClicks";
 
 const Dashboard = () => {
   const [searchQuery, setSearchQuery] = useState("");
-  const {user} = UrlState();
-  const {loading, error, data: urls, fn: fnUrls} = useFetch(getUrls, user.id);
+  const [urls, setUrls] = useState([]);
+  const session = JSON.parse(localStorage.getItem("decodedToken"));
+  const {
+    loading,
+    error,
+    data: fetchedUrls,
+    fn: fnUrls,
+  } = useFetch(getUrls, session.id);
   const {
     loading: loadingClicks,
     data: clicks,
     fn: fnClicks,
-  } = useFetch(
-    getClicksForUrls,
-    urls?.map((url) => url.id)
-  );
+  } = useFetch(getClicksForUrls);
 
   useEffect(() => {
     fnUrls();
-  }, [fnUrls]);
+  }, []);
+
+  useEffect(() => {
+    if (fetchedUrls) {
+      setUrls(fetchedUrls);
+    }
+  }, [fetchedUrls]);
+
+  const handleNewUrl = (newUrl) => {
+    setUrls((prevUrls) => [newUrl, ...prevUrls]);
+  };
 
   const filteredUrls = urls?.filter((url) =>
     url.title.toLowerCase().includes(searchQuery.toLowerCase())
@@ -39,10 +52,10 @@ const Dashboard = () => {
 
   useEffect(() => {
     if (urls?.length) fnClicks();
-  }, [fnClicks, urls?.length]);
+  }, [urls]);
 
   return (
-    <div className="flex flex-col gap-8">
+    <div className="flex flex-col gap-8 sm p-5">
       {(loading || loadingClicks) && (
         <BarLoader width={"100%"} color="#36d7b7" />
       )}
@@ -60,13 +73,13 @@ const Dashboard = () => {
             <CardTitle>Total Clicks</CardTitle>
           </CardHeader>
           <CardContent>
-            <p>{clicks?.length}</p>
+            <p>{clicks?.total_clicks}</p>
           </CardContent>
         </Card>
       </div>
-      <div className="flex justify-between">
-        <h1 className="text-4xl font-extrabold">My Links</h1>
-        <CreateLink />
+      <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
+        <h1 className="text-2xl sm:text-4xl font-extrabold">My Links</h1>
+        <CreateLink onNewUrl={handleNewUrl} />
       </div>
       <div className="relative">
         <Input

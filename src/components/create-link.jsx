@@ -9,22 +9,20 @@ import {
 } from "@/components/ui/dialog";
 import {Input} from "@/components/ui/input";
 import {Card} from "./ui/card";
-import {useNavigate, useSearchParams} from "react-router-dom";
+import {useSearchParams} from "react-router-dom";
 import {useEffect, useRef, useState} from "react";
 import Error from "./error";
 import * as yup from "yup";
 import useFetch from "@/hooks/use-fetch";
 import {createUrl} from "@/db/apiUrls";
 import {BeatLoader} from "react-spinners";
-import {UrlState} from "@/context";
 import {QRCode} from "react-qrcode-logo";
+import {toast} from 'react-hot-toast'
 
-export function CreateLink() {
-  const {user} = UrlState();
-
-  const navigate = useNavigate();
+// eslint-disable-next-line react/prop-types
+export function CreateLink({ onNewUrl }) {
   const ref = useRef();
-
+  const session = JSON.parse(localStorage.getItem("decodedToken"));
   let [searchParams, setSearchParams] = useSearchParams();
   const longLink = searchParams.get("createNew");
 
@@ -34,6 +32,7 @@ export function CreateLink() {
     longUrl: longLink ? longLink : "",
     customUrl: "",
   });
+  const [isDialogOpen, setIsDialogOpen] = useState(!!longLink);
 
   const schema = yup.object().shape({
     title: yup.string().required("Title is required"),
@@ -54,26 +53,22 @@ export function CreateLink() {
   const {
     loading,
     error,
-    data,
     fn: fnCreateUrl,
-  } = useFetch(createUrl, {...formValues, user_id: user.id});
-
-  useEffect(() => {
-    if (error === null && data) {
-      navigate(`/link/${data[0].id}`);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [error, data]);
+    data
+  } = useFetch(createUrl, { ...formValues, userId: session.id });
 
   const createNewLink = async () => {
     setErrors([]);
     try {
-      await schema.validate(formValues, {abortEarly: false});
+      await schema.validate(formValues, { abortEarly: false });
 
       const canvas = ref.current.canvasRef.current;
       const blob = await new Promise((resolve) => canvas.toBlob(resolve));
-
+      console.log(blob);
       await fnCreateUrl(blob);
+
+
+
     } catch (e) {
       const newErrors = {};
 
@@ -85,10 +80,29 @@ export function CreateLink() {
     }
   };
 
+  useEffect(() => {
+    if (error === null && data && !loading ) {
+      toast.success("URL created successfully!");
+      setFormValues({
+        title: "",
+        longUrl: "",
+        customUrl: "",
+      });
+      onNewUrl(data);
+      setIsDialogOpen(false);
+    }
+    
+   
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [error, loading]);
+
+  console.log("loading :", loading)
+
   return (
     <Dialog
-      defaultOpen={longLink}
+      open={isDialogOpen}
       onOpenChange={(res) => {
+        setIsDialogOpen(res);
         if (!res) setSearchParams({});
       }}
     >
@@ -112,13 +126,13 @@ export function CreateLink() {
         {errors.title && <Error message={errors.title} />}
         <Input
           id="longUrl"
-          placeholder="Enter your Loooong URL"
+          placeholder="Enter your Long URL"
           value={formValues.longUrl}
           onChange={handleChange}
         />
         {errors.longUrl && <Error message={errors.longUrl} />}
-        <div className="flex items-center gap-2">
-          <Card className="p-2">trimrr.in</Card> /
+        <div className="flex items-center gap-2 bg-rose-500">
+          <Card className="p-2">shortener.api</Card> /
           <Input
             id="customUrl"
             placeholder="Custom Link (optional)"
@@ -141,3 +155,4 @@ export function CreateLink() {
     </Dialog>
   );
 }
+

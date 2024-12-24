@@ -1,39 +1,51 @@
 /* eslint-disable react/prop-types */
 import {
-  LineChart,
-  Line,
+  BarChart,
+  Bar,
   XAxis,
   YAxis,
+  CartesianGrid,
   Tooltip,
   Legend,
   ResponsiveContainer,
 } from "recharts";
 
-export default function Location({stats = []}) {
-  const cityCount = stats.reduce((acc, item) => {
-    if (acc[item.city]) {
-      acc[item.city] += 1;
-    } else {
-      acc[item.city] = 1;
-    }
-    return acc;
-  }, {});
+// Tentukan warna untuk tiap kategori
 
-  const cities = Object.entries(cityCount).map(([city, count]) => ({
+export default function Location({ stats }) {
+  // Ambil klik berdasarkan bulan terakhir (misalnya, Desember 2024)
+  const monthlyClicks = stats.monthly_clicks["2024-12"]; 
+
+  // Hitung jumlah klik per kota
+  const cityCount = Object.entries(monthlyClicks.cities).map(([city, count]) => ({
     city,
     count,
   }));
 
   return (
-    <div style={{width: "100%", height: 300}}>
+    <div style={{ width: "100%", height: 300 }}>
       <ResponsiveContainer>
-        <LineChart width={700} height={300} data={cities.slice(0, 5)}>
+        <BarChart data={cityCount} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+          <CartesianGrid strokeDasharray="3 3" />
           <XAxis dataKey="city" />
           <YAxis />
-          <Tooltip labelStyle={{color: "green"}} />
+          <Tooltip
+            content={({ payload }) => {
+              if (payload && payload.length) {
+                const { city, count } = payload[0].payload;
+                return (
+                  <div>
+                    <strong>{city}</strong>
+                    <p>{`Klik: ${count}`}</p>
+                  </div>
+                );
+              }
+              return null;
+            }}
+          />
           <Legend />
-          <Line type="monotone" dataKey="count" stroke="#82ca9d" />
-        </LineChart>
+          <Bar dataKey="count" fill="#8884d8" />
+        </BarChart>
       </ResponsiveContainer>
     </div>
   );

@@ -1,45 +1,35 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+import DailyClicks from "@/components/daily-click";
 import DeviceStats from "@/components/device-stats";
-import Location from "@/components/location-stats";
-import {Button} from "@/components/ui/button";
-import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
-import {UrlState} from "@/context";
-import {getClicksForUrl} from "@/db/apiClicks";
-import {deleteUrl, getUrl} from "@/db/apiUrls";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { getClicksForUrl } from "@/db/apiClicks";
+import { deleteUrl, getUrl } from "@/db/apiUrls";
 import useFetch from "@/hooks/use-fetch";
-import {Copy, Download, LinkIcon, Trash} from "lucide-react";
-import {useEffect} from "react";
-import {useNavigate, useParams} from "react-router-dom";
-import {BarLoader, BeatLoader} from "react-spinners";
+import { Copy, Download, LinkIcon, Trash } from "lucide-react";
+import { useEffect } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import { BarLoader, BeatLoader } from "react-spinners";
+
+const URL_APP = import.meta.env.VITE_APP_URL;
 
 const LinkPage = () => {
   const downloadImage = () => {
     const imageUrl = url?.qr;
     const fileName = url?.title;
 
-    // Create an anchor element
     const anchor = document.createElement("a");
     anchor.href = imageUrl;
     anchor.download = fileName;
-  
 
-    // Append the anchor to the body
     document.body.appendChild(anchor);
-
-    // Trigger the download by simulating a click event
     anchor.click();
-
-    // Remove the anchor from the document
     document.body.removeChild(anchor);
   };
+
   const navigate = useNavigate();
-  const {user} = UrlState();
-  const {id} = useParams();
-  const {
-    loading,
-    data: url,
-    fn,
-    error,
-  } = useFetch(getUrl, {id, user_id: user?.id});
+  const { id } = useParams();
+  const { loading, data: url, fn, error } = useFetch(getUrl, { id });
 
   const {
     loading: loadingStats,
@@ -47,58 +37,70 @@ const LinkPage = () => {
     fn: fnStats,
   } = useFetch(getClicksForUrl, id);
 
-  const {loading: loadingDelete, fn: fnDelete} = useFetch(deleteUrl, id);
+  const { loading: loadingDelete, fn: fnDelete } = useFetch(deleteUrl, id);
 
   useEffect(() => {
-    fn();
-  }, []);
+    if (!url) fn(); // Fetch hanya sekali
+  }, [url]);
 
   useEffect(() => {
     if (!error && loading === false) fnStats();
   }, [loading, error]);
 
-  if (error) {
-    navigate("/dashboard");
-  }
-
   let link = "";
   if (url) {
-    link = url?.custom_url ? url?.custom_url : url.short_url;
+    link = url?.shortUrl;
   }
+
+  const dailyClicks =
+    stats?.daily_clicks?.[new Date().toISOString().split("T")[0]]?.clicks || 0;
+
+  const weeklyClicks =
+    stats?.weekly_clicks?.[`2024-W${Math.ceil(new Date().getDate() / 7)}`]?.clicks ||
+    0;
+    
+  const monthlyClicks =
+    stats?.monthly_clicks?.[new Date().toISOString().split("-").slice(0, 2).join("-")].clicks || 0;
 
   return (
     <>
       {(loading || loadingStats) && (
         <BarLoader className="mb-4" width={"100%"} color="#36d7b7" />
       )}
-      <div className="flex flex-col gap-8 sm:flex-row justify-between">
+
+      <div className="flex flex-col gap-8 sm:flex-row justify-between px-4 sm:px-8 py-6">
+        {/* Left Section */}
         <div className="flex flex-col items-start gap-8 rounded-lg sm:w-2/5">
-          <span className="text-6xl font-extrabold hover:underline cursor-pointer">
-            {url?.title}
+          <span className="text-4xl sm:text-6xl font-extrabold hover:underline cursor-pointer">
+            {url?.title || "Loading..."}
           </span>
+
           <a
-            href={`https://trimrr.in/${link}`}
+            href={`${URL_APP}/${link}`}
             target="_blank"
-            className="text-3xl sm:text-4xl text-blue-400 font-bold hover:underline cursor-pointer"
+            className="text-2xl sm:text-3xl text-rose-400 font-bold hover:underline cursor-pointer"
           >
-            https://trimrr.in/{link}
+            {URL_APP}/{link || "Loading..."}
           </a>
+
           <a
-            href={url?.original_url}
+            href={url?.originalUrl || "#"}
             target="_blank"
-            className="flex items-center gap-1 hover:underline cursor-pointer"
+            className="truncate w-full flex items-center hover:underline cursor-pointer"
           >
-            <LinkIcon className="p-1" />
-            {url?.original_url}
+            <LinkIcon/>
+            {url?.originalUrl || "Loading..."}
           </a>
+
           <span className="flex items-end font-extralight text-sm">
-            {new Date(url?.created_at).toLocaleString()}
+            {url ? new Date(url?.createdAt).toLocaleString() : "Loading..."}
           </span>
+
           <div className="flex gap-2">
             <Button
               variant="ghost"
               onClick={() =>
-                navigator.clipboard.writeText(`https://trimrr.in/${link}`)
+                navigator.clipboard.writeText(`${URL_APP}/${link}`)
               }
             >
               <Copy />
@@ -113,7 +115,7 @@ const LinkPage = () => {
                   navigate("/dashboard");
                 })
               }
-              disable={loadingDelete}
+              disabled={loadingDelete}
             >
               {loadingDelete ? (
                 <BeatLoader size={5} color="white" />
@@ -122,38 +124,80 @@ const LinkPage = () => {
               )}
             </Button>
           </div>
+
+          {/* QR Code */}
           <img
-            src={url?.qr}
-            className="w-full self-center sm:self-start ring ring-blue-500 p-1 object-contain"
-            alt="qr code"
-          />
+  src={url?.qr || "placeholder-image-url"}
+  className="sm:w-30 md:w-64 lg:w-48 self-center sm:self-start ring ring-rose-300 p-1 object-contain"
+  alt="qr code"
+/>
         </div>
 
-        <Card className="sm:w-3/5">
+        {/* Right Section (Stats) */}
+        <Card className="sm:w-3/5 w-full">
           <CardHeader>
-            <CardTitle className="text-4xl font-extrabold">Stats</CardTitle>
+            <CardTitle className="text-3xl sm:text-4xl font-extrabold text-center">Statistics</CardTitle>
           </CardHeader>
-          {stats && stats.length ? (
-            <CardContent className="flex flex-col gap-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Total Clicks</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p>{stats?.length}</p>
-                </CardContent>
-              </Card>
 
-              <CardTitle>Location Data</CardTitle>
-              <Location stats={stats} />
+          {stats && stats?.message === "No clicks yet" ? (
+            <CardContent>No Statistics Yet</CardContent> 
+          ) : stats ? (
+            <CardContent className="flex flex-col gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                {/* Total Clicks */}
+                <Card className="p-4 shadow-md border border-rose-100 rounded-md">
+                  <CardHeader>
+                    <CardTitle>Total Clicks</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-xl font-semibold">
+                      {stats?.total_clicks || 0}
+                    </p>
+                  </CardContent>
+                </Card>
+
+                {/* Daily Clicks */}
+                <Card className="p-4 shadow-md border border-rose-100 rounded-md">
+                  <CardHeader>
+                    <CardTitle>Daily Clicks</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-xl font-semibold">{dailyClicks}</p>
+                  </CardContent>
+                </Card>
+
+                {/* Weekly Clicks */}
+                <Card className="p-4 shadow-md border border-rose-100 rounded-md">
+                  <CardHeader>
+                    <CardTitle>Weekly Clicks</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-xl font-semibold">{weeklyClicks}</p>
+                  </CardContent>
+                </Card>
+
+                {/* Monthly Clicks */}
+                <Card className="p-4 shadow-md border border-rose-100 rounded-md">
+                  <CardHeader>
+                    <CardTitle>Monthly Clicks</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-xl font-semibold">{monthlyClicks}</p>
+                  </CardContent>
+                </Card>
+              </div>
+
+              <CardTitle>Daily Clicks Trend</CardTitle>
+              <DailyClicks stats={stats} />
+
               <CardTitle>Device Info</CardTitle>
               <DeviceStats stats={stats} />
             </CardContent>
           ) : (
             <CardContent>
               {loadingStats === false
-                ? "No Statistics yet"
-                : "Loading Statistics.."}
+                ? "No Statistics Yet"
+                : "Loading Statistics..."}
             </CardContent>
           )}
         </Card>
