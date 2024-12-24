@@ -1,7 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import DailyClicks from "@/components/daily-click";
 import DeviceStats from "@/components/device-stats";
-import Location from "@/components/location-stats";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { getClicksForUrl } from "@/db/apiClicks";
@@ -13,6 +12,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { BarLoader, BeatLoader } from "react-spinners";
 
 const URL_APP = import.meta.env.VITE_APP_URL;
+
 const LinkPage = () => {
   const downloadImage = () => {
     const imageUrl = url?.qr;
@@ -26,6 +26,7 @@ const LinkPage = () => {
     anchor.click();
     document.body.removeChild(anchor);
   };
+
   const navigate = useNavigate();
   const { id } = useParams();
   const { loading, data: url, fn, error } = useFetch(getUrl, { id });
@@ -51,36 +52,50 @@ const LinkPage = () => {
     link = url?.shortUrl;
   }
 
-  console.log(stats);
+  const dailyClicks =
+    stats?.daily_clicks?.[new Date().toISOString().split("T")[0]]?.clicks || 0;
+
+  const weeklyClicks =
+    stats?.weekly_clicks?.[`2024-W${Math.ceil(new Date().getDate() / 7)}`]?.clicks ||
+    0;
+    
+  const monthlyClicks =
+    stats?.monthly_clicks?.[new Date().toISOString().split("-").slice(0, 2).join("-")].clicks || 0;
 
   return (
     <>
       {(loading || loadingStats) && (
         <BarLoader className="mb-4" width={"100%"} color="#36d7b7" />
       )}
-      <div className="flex flex-col gap-8 sm:flex-row justify-between">
+
+      <div className="flex flex-col gap-8 sm:flex-row justify-between px-4 sm:px-8 py-6">
+        {/* Left Section */}
         <div className="flex flex-col items-start gap-8 rounded-lg sm:w-2/5">
-          <span className="text-6xl font-extrabold hover:underline cursor-pointer">
+          <span className="text-4xl sm:text-6xl font-extrabold hover:underline cursor-pointer">
             {url?.title || "Loading..."}
           </span>
+
           <a
             href={`${URL_APP}/${link}`}
             target="_blank"
-            className="text-3xl sm:text-4xl text-blue-400 font-bold hover:underline cursor-pointer"
+            className="text-2xl sm:text-3xl text-rose-400 font-bold hover:underline cursor-pointer"
           >
             {URL_APP}/{link || "Loading..."}
           </a>
+
           <a
             href={url?.originalUrl || "#"}
             target="_blank"
-            className="flex items-center gap-1 hover:underline cursor-pointer"
+            className="truncate w-full flex items-center hover:underline cursor-pointer"
           >
-            <LinkIcon className="p-1" />
+            <LinkIcon/>
             {url?.originalUrl || "Loading..."}
           </a>
+
           <span className="flex items-end font-extralight text-sm">
             {url ? new Date(url?.createdAt).toLocaleString() : "Loading..."}
           </span>
+
           <div className="flex gap-2">
             <Button
               variant="ghost"
@@ -100,7 +115,7 @@ const LinkPage = () => {
                   navigate("/dashboard");
                 })
               }
-              disable={loadingDelete}
+              disabled={loadingDelete}
             >
               {loadingDelete ? (
                 <BeatLoader size={5} color="white" />
@@ -109,24 +124,28 @@ const LinkPage = () => {
               )}
             </Button>
           </div>
+
+          {/* QR Code */}
           <img
-            src={url?.qr || "placeholder-image-url"}
-            className="w-full self-center sm:self-start ring ring-blue-500 p-1 object-contain"
-            alt="qr code"
-          />
+  src={url?.qr || "placeholder-image-url"}
+  className="sm:w-30 md:w-64 lg:w-48 self-center sm:self-start ring ring-rose-300 p-1 object-contain"
+  alt="qr code"
+/>
         </div>
 
-        <Card className="sm:w-3/5">
+        {/* Right Section (Stats) */}
+        <Card className="sm:w-3/5 w-full">
           <CardHeader>
-            <CardTitle className="text-4xl font-extrabold">Stats</CardTitle>
+            <CardTitle className="text-3xl sm:text-4xl font-extrabold text-center">Statistics</CardTitle>
           </CardHeader>
+
           {stats && stats?.message === "No clicks yet" ? (
-            <CardContent>No Statistics Yet</CardContent>
+            <CardContent>No Statistics Yet</CardContent> 
           ) : stats ? (
             <CardContent className="flex flex-col gap-6">
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 {/* Total Clicks */}
-                <Card className="p-4 shadow-md border border-gray-300 rounded-md">
+                <Card className="p-4 shadow-md border border-rose-100 rounded-md">
                   <CardHeader>
                     <CardTitle>Total Clicks</CardTitle>
                   </CardHeader>
@@ -138,56 +157,39 @@ const LinkPage = () => {
                 </Card>
 
                 {/* Daily Clicks */}
-                <Card className="p-4 shadow-md border border-gray-300 rounded-md">
+                <Card className="p-4 shadow-md border border-rose-100 rounded-md">
                   <CardHeader>
                     <CardTitle>Daily Clicks</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <p className="text-xl font-semibold">
-                      {stats?.daily_clicks?.[
-                        new Date().toISOString().split("T")[0]
-                      ]?.clicks || 0}
-                    </p>
+                    <p className="text-xl font-semibold">{dailyClicks}</p>
                   </CardContent>
                 </Card>
 
                 {/* Weekly Clicks */}
-                <Card className="p-4 shadow-md border border-gray-300 rounded-md">
+                <Card className="p-4 shadow-md border border-rose-100 rounded-md">
                   <CardHeader>
                     <CardTitle>Weekly Clicks</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <p className="text-xl font-semibold">
-                      {stats?.weekly_clicks?.[
-                        `2024-W${Math.ceil(new Date().getDate() / 7)}`
-                      ]?.clicks || 0}
-                    </p>
+                    <p className="text-xl font-semibold">{weeklyClicks}</p>
                   </CardContent>
                 </Card>
 
                 {/* Monthly Clicks */}
-                <Card className="p-4 shadow-md border border-gray-300 rounded-md">
+                <Card className="p-4 shadow-md border border-rose-100 rounded-md">
                   <CardHeader>
                     <CardTitle>Monthly Clicks</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <p className="text-xl font-semibold">
-                      {stats?.monthly_clicks?.[
-                        new Date()
-                          .toISOString()
-                          .split("-")
-                          .slice(0, 2)
-                          .join("-")
-                      ]?.clicks || 0}
-                    </p>
+                    <p className="text-xl font-semibold">{monthlyClicks}</p>
                   </CardContent>
                 </Card>
               </div>
 
               <CardTitle>Daily Clicks Trend</CardTitle>
               <DailyClicks stats={stats} />
-              <CardTitle>Location Data</CardTitle>
-              <Location stats={stats} />
+
               <CardTitle>Device Info</CardTitle>
               <DeviceStats stats={stats} />
             </CardContent>

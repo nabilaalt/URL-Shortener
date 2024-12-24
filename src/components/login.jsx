@@ -137,8 +137,9 @@ const Login = () => {
   <Button 
     onClick={handleLogin}
     disabled={loading}
+    variant="destructive"
     className="w-full">
-    {loading ? <BeatLoader size={10} color="#36d7b7" /> : "Login"}
+    {loading ? <BeatLoader size={10} /> : "Login"}
   </Button>
 
   <Button 
