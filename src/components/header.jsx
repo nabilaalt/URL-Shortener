@@ -22,18 +22,20 @@ const Header = () => {
 
   // Function to handle back button click
   const handleBack = () => {
+    console.log(location.pathname);
     // If on the dashboard or auth page, navigate to landing page
-    if (location.pathname === "/dashboard" || location.pathname === "/auth" ) {
+    if (location.pathname === "/dashboard" || location.pathname === "/auth") {
       navigate("/");
+    }else if (location.pathname === "/forgot-password") {
+        navigate("/");
     } else {
-        navigate(-1);
-      
+      navigate(-1);
     }
   };
 
   // Check if we are on specific pages
   const isLandingPage = location.pathname === "/";
-  const isAuth= location.pathname === "/auth";
+  const isAuth = location.pathname === "/auth";
   const isResetPassword = location.pathname === "/forgot-password";
   return (
     <>
@@ -45,23 +47,23 @@ const Header = () => {
           {/* Conditionally render Back button (if not on landing page) */}
           {!isLandingPage && (
             <Button
-  variant="destructive"
-  onClick={handleBack}
-  className="flex items-center space-x-2 p-2 sm:p-4 border rounded-lg text-sm sm:text-base"
->
-  <ArrowLeft className="h-4 w-4" />
-  <span>Back</span>
-</Button>
-
+              variant="destructive"
+              onClick={handleBack}
+              className="flex items-center space-x-2 p-2 sm:p-4 border rounded-lg text-sm sm:text-base"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              <span>Back</span>
+            </Button>
           )}
           {/* Conditionally render Login button (if no session and not on auth page) */}
           {!session && !isAuth && !isResetPassword && (
-            <Button 
-            onClick={() => navigate("/auth")}
+            <Button
+              onClick={() => navigate("/auth")}
               variant="destructive"
-            className="hover:shadow-xl hover:bg-rose-600 transform transition-all duration-300 ease-in-out"> 
-               Login
-               </Button>
+              className="hover:shadow-xl hover:bg-rose-600 transform transition-all duration-300 ease-in-out"
+            >
+              Login
+            </Button>
           )}
           {/* Dropdown Menu for logged-in users */}
           {session && (
@@ -84,7 +86,7 @@ const Header = () => {
                 <DropdownMenuItem
                   onClick={() => {
                     fnLogout().then(() => {
-                      navigate("/"); 
+                      navigate("/");
                     });
                   }}
                   className="text-red-400"
@@ -103,5 +105,3 @@ const Header = () => {
 };
 
 export default Header;
-
-

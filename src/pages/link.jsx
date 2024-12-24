@@ -10,6 +10,7 @@ import { Copy, Download, LinkIcon, Trash } from "lucide-react";
 import { useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { BarLoader, BeatLoader } from "react-spinners";
+import { DateTime } from 'luxon';
 
 const URL_APP = import.meta.env.VITE_APP_URL;
 
@@ -31,6 +32,7 @@ const LinkPage = () => {
   const { id } = useParams();
   const { loading, data: url, fn, error } = useFetch(getUrl, { id });
 
+  const currentDateISO = new Date().toISOString().split('T')[0];
   const {
     loading: loadingStats,
     data: stats,
@@ -56,11 +58,15 @@ const LinkPage = () => {
     stats?.daily_clicks?.[new Date().toISOString().split("T")[0]]?.clicks || 0;
 
   const weeklyClicks =
-    stats?.weekly_clicks?.[`2024-W${Math.ceil(new Date().getDate() / 7)}`]?.clicks ||
-    0;
-    
+    stats?.weekly_clicks?.[DateTime.fromISO(currentDateISO).toFormat("kkkk-'W'WW")]
+      ?.clicks || 0;
+
+  console.log()
+
   const monthlyClicks =
-    stats?.monthly_clicks?.[new Date().toISOString().split("-").slice(0, 2).join("-")].clicks || 0;
+    stats?.monthly_clicks?.[
+      new Date().toISOString().split("-").slice(0, 2).join("-")
+    ].clicks || 0;
 
   return (
     <>
@@ -88,7 +94,7 @@ const LinkPage = () => {
             target="_blank"
             className="truncate w-full flex items-center hover:underline cursor-pointer"
           >
-            <LinkIcon/>
+            <LinkIcon />
             {url?.originalUrl || "Loading..."}
           </a>
 
@@ -127,20 +133,22 @@ const LinkPage = () => {
 
           {/* QR Code */}
           <img
-  src={url?.qr || "placeholder-image-url"}
-  className="sm:w-30 md:w-64 lg:w-48 self-center sm:self-start ring ring-rose-300 p-1 object-contain"
-  alt="qr code"
-/>
+            src={url?.qr || "placeholder-image-url"}
+            className="sm:w-30 md:w-64 lg:w-48 self-center sm:self-start ring ring-rose-300 p-1 object-contain"
+            alt="qr code"
+          />
         </div>
 
         {/* Right Section (Stats) */}
         <Card className="sm:w-3/5 w-full">
           <CardHeader>
-            <CardTitle className="text-3xl sm:text-4xl font-extrabold text-center">Statistics</CardTitle>
+            <CardTitle className="text-3xl sm:text-4xl font-extrabold text-center">
+              Statistics
+            </CardTitle>
           </CardHeader>
 
           {stats && stats?.message === "No clicks yet" ? (
-            <CardContent>No Statistics Yet</CardContent> 
+            <CardContent>No Statistics Yet</CardContent>
           ) : stats ? (
             <CardContent className="flex flex-col gap-6">
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
