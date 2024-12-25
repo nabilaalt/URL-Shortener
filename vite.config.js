@@ -1,4 +1,3 @@
-/* eslint-disable no-undef */
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import path from "path";
@@ -8,7 +7,7 @@ export default defineConfig({
   plugins: [
     react(),
     VitePWA({
-      registerType: "prompt",
+      registerType: 'autoUpdate', // Aktifkan autoUpdate di dev
       includeAssets: ["/logo-google.png", "/logo.png", "/vite.svg"],
       manifest: {
         name: "URL Shortener",
@@ -36,6 +35,10 @@ export default defineConfig({
         display: "standalone",
         scope: "/",
         start_url: "/",
+      },
+      devOptions: {
+        enabled: true, // Enable PWA in development mode
+        type: "module", // Use module-based service worker
       },
     }),
   ],

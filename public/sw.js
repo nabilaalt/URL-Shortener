@@ -1,4 +1,4 @@
-const CACHE_NAME = "shortener-cache-v1";
+const CACHE_NAME = "shortener-cache-v2";
 
 const urlsToCache = [
     "/",               // Mengacu ke index.html di root
@@ -10,7 +10,7 @@ const urlsToCache = [
 
 // Install event: cache semua file penting
 self.addEventListener("install", (event) => {
-  console.log("Service Worker: Install");
+  console.log('Service Worker installed');
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
       return cache.addAll(urlsToCache).catch((err) => {
@@ -22,6 +22,7 @@ self.addEventListener("install", (event) => {
 
 // Fetch event: gunakan cache jika ada, jika tidak ambil dari network
 self.addEventListener("fetch", (event) => {
+    console.log('Service Worker intercepting fetch:', event.request);
     event.respondWith(
       caches.match(event.request).then((response) => {
         return response || fetch(event.request).catch(() => caches.match("/index.html"));
@@ -31,6 +32,7 @@ self.addEventListener("fetch", (event) => {
 
 // Activate event: hapus cache lama jika ada versi baru
 self.addEventListener("activate", (event) => {
+  console.log('Service Worker activated');
   const cacheWhitelist = [CACHE_NAME];
   event.waitUntil(
     caches.keys().then((cacheNames) => {
