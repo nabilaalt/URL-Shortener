@@ -54,6 +54,8 @@ const Dashboard = () => {
     if (urls?.length) fnClicks();
   }, [urls]);
 
+  console.log("total clicks", clicks?.total_clicks);
+
   return (
     <div className="flex flex-col gap-8 sm p-5">
       {(loading || loadingClicks) && (
@@ -73,7 +75,7 @@ const Dashboard = () => {
             <CardTitle>Total Clicks</CardTitle>
           </CardHeader>
           <CardContent>
-            <p>{clicks?.total_clicks}</p>
+            <p>{clicks?.total_clicks || 0}</p>
           </CardContent>
         </Card>
       </div>
