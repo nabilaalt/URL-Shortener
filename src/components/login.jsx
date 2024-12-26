@@ -16,6 +16,7 @@ import { login } from "@/db/apiAuth";
 import { BeatLoader } from "react-spinners";
 import useFetch from "@/hooks/use-fetch";
 import * as jose from "jose";
+import { FcGoogle } from "react-icons/fc";
 // import {UrlState} from "@/context";
 const URL_API = import.meta.env.VITE_API_URL;
 
@@ -146,10 +147,7 @@ const Login = () => {
     onClick={() => {window.location.href = `${URL_API}/auth/google`;}} 
     disabled={loading}
     className="w-full flex items-center justify-center bg-white border border-gray-300 text-gray-700 hover:bg-gray-200">
-    <img 
-      src="public/logo-google.png" 
-      alt="Google Logo" 
-      className="w-5 h-5 mr-2" />
+    <FcGoogle size={24} />
     {loading ? <BeatLoader size={10} color="#36d7b7" /> : "Login With Google"}
   </Button>
 
