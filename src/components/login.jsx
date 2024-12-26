@@ -147,7 +147,7 @@ const Login = () => {
     onClick={() => {window.location.href = `${URL_API}/auth/google`;}} 
     disabled={loading}
     className="w-full flex items-center justify-center bg-white border border-gray-300 text-gray-700 hover:bg-gray-200">
-    <FcGoogle size={24} />
+    <FcGoogle size={24} className="mr-2" />
     {loading ? <BeatLoader size={10} color="#36d7b7" /> : "Login With Google"}
   </Button>
 
