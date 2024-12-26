@@ -51,7 +51,7 @@ const LinkPage = () => {
 
   let link = "";
   if (url) {
-    link = url?.shortUrl;
+    link =url?.customUrl|| url?.shortUrl ;
   }
 
   const dailyClicks =

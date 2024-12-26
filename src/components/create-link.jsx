@@ -30,7 +30,7 @@ export function CreateLink({ onNewUrl }) {
   const [formValues, setFormValues] = useState({
     title: "",
     longUrl: longLink ? longLink : "",
-    customUrl: "",
+    customUrl: "",  
   });
   const [isDialogOpen, setIsDialogOpen] = useState(!!longLink);
 
