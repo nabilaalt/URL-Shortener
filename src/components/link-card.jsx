@@ -44,27 +44,32 @@ const LinkCard = ({ url = {}, fetchUrls }) => {
           <span className="truncate w-full text-base md:text-sm">{url?.originalUrl}</span> 
         </span>
         <span className="flex items-end font-extralight text-sm flex-1">
-          {new Date(url?.createdAt).toLocaleString()} {/* Adjusted property name */}
-        </span>
-      </Link>
-      <div className="flex gap-2">
-        <Button
-          variant="ghost"
-          onClick={() =>
-            navigator.clipboard.writeText(
-              `${APP_URL}/${url?.shortUrl}` /* Adjusted property name */
-            )
-          }
-        >
-          <Copy />
-        </Button>
-        <Button variant="ghost" onClick={downloadImage}>
-          <Download />
-        </Button>
-        <Button
-          variant="ghost"
-          onClick={() => fnDelete().then(() => fetchUrls())}
-          disabled={loadingDelete} // Fixed typo from 'disable' to 'disabled'
+            </span>
+                </Link>
+                <div className="flex gap-2">
+            <Button
+              variant="outline"
+              className="border-rose-500  text-white hover:border-rose-500  hover:bg-rose-500"
+              onClick={() =>
+                navigator.clipboard.writeText(
+                  `${APP_URL}/${url?.shortUrl}` /* Adjusted property name */
+                )
+              }
+            >
+              <Copy />
+            </Button>
+            <Button
+              variant="outline"
+              className="border-rose-500  text-white hover:border-rose-500  hover:bg-rose-500"
+              onClick={downloadImage}
+            >
+              <Download />
+            </Button>
+            <Button
+              variant="outline"
+              className="border-rose-500  text-white hover:border-rose-500  hover:bg-rose-500"
+              onClick={() => fnDelete().then(() => fetchUrls())}
+              disabled={loadingDelete} // Fixed typo from 'disable' to 'disabled'
         >
           {loadingDelete ? <BeatLoader size={5} color="white" /> : <Trash />}
         </Button>
