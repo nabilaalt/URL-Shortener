@@ -30,7 +30,7 @@ const Dashboard = () => {
     loading: loadingClicks,
     data: clicks,
     fn: fnClicks,
-  } = useFetch(getClicksForUrls);
+  } = useFetch(getClicksForUrls, session.id);
 
   useEffect(() => {
     fnUrls();
@@ -54,7 +54,7 @@ const Dashboard = () => {
     if (urls?.length) fnClicks();
   }, [urls]);
 
-  console.log("total clicks", clicks?.total_clicks);
+  console.log("total clicks", clicks);
 
   return (
     <div className="flex flex-col gap-8 sm p-5">

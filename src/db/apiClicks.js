@@ -1,9 +1,9 @@
 
 const URL_API = import.meta.env.VITE_API_URL;
 
-export async function getClicksForUrls() {
+export async function getClicksForUrls(userId) {
   try {
-    const response = await fetch(`${URL_API}/stats/total`);
+    const response = await fetch(`${URL_API}/stats/total?userId=${userId}`);
     const data = await response.json();
 
     console.log(data)
