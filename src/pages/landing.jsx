@@ -61,7 +61,7 @@ const LandingPage = () => {
               description:
                 "Track clicks, user location, and device types for each of your shortened URLs to gather valuable insights.",
               icon: "📊",
-              link: "/link/:id",
+              link: "/dashboard",
             },
           ].map((feature, index) => (
             <Link

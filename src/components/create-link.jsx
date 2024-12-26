@@ -132,7 +132,7 @@ export function CreateLink({ onNewUrl }) {
         />
         {errors.longUrl && <Error message={errors.longUrl} />}
         <div className="flex items-center gap-2 bg-rose-500">
-          <Card className="p-2">shortener.api</Card> /
+          <Card className="p-2">ss.shortif.com</Card> /
           <Input
             id="customUrl"
             placeholder="Custom Link (optional)"
