@@ -111,13 +111,11 @@ export async function getCurrentUser() {
 
 export async function logout() {
   return new Promise((resolve) => {
-    // Remove the decoded token from localStorage
     localStorage.removeItem("decodedToken");
 
-    // Optional delay to ensure smooth execution
     setTimeout(() => {
       resolve({ success: true }); // Simulate a success response
-    }, 0);
+    }, 1000);
   });
 }
 

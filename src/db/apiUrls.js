@@ -18,6 +18,7 @@ export async function getUrls(user_id) {
 export async function getUrl({id}) {
   const response = await fetch(`${URL_API}/shortener/${id}`);
   const data = await response.json();
+  console.log(data)
   if (!response.ok) {
     console.error(data.error);
     throw new Error(data.error || "Error fetching URL");
@@ -26,27 +27,12 @@ export async function getUrl({id}) {
   return data;
 }
 
-export async function getLongUrl(id) {
-  let {data: shortLinkData, error: shortLinkError} = await supabase
-    .from("urls")
-    .select("id, original_url")
-    .or(`short_url.eq.${id},custom_url.eq.${id}`)
-    .single();
-
-  if (shortLinkError && shortLinkError.code !== "PGRST116") {
-    console.error("Error fetching short link:", shortLinkError);
-    return;
-  }
-
-  return shortLinkData;
-}
-
 export async function createUrl({title, longUrl, customUrl, userId}, qrcode) {
   const shortUrl = Math.random().toString(36).substring(2, 8);
   const fileName = `qr-${shortUrl}`;
-  console.log(qrcode)
+  console.log(qrcode);
 
-  const {error: storageError} = await supabase.storage
+  const { error: storageError } = await supabase.storage
     .from("shortener-API")
     .upload(`qrs/${fileName}`, qrcode);
 
@@ -80,9 +66,9 @@ export async function createUrl({title, longUrl, customUrl, userId}, qrcode) {
   const data = await response.json();
 
   if (!response.ok) {
-    console.error(data.error);
-    throw new Error(data.error || "Error creating short URL");
+    throw new Error(data.error || 'Failed to create the URL'); // Throw error if response is not ok
   }
+
   return data.link;
 }
 
@@ -102,4 +88,61 @@ export async function deleteUrl(id) {
   }
 
   return data;
+}
+
+export async function updateUrl({ longUrl, shortUrl, linkId}, qrcode) {
+  console.log("shortUrl",shortUrl)
+  // Delete existing QR code
+  const fileName = `qr-${shortUrl}`;
+  const { error: deleteError } = await supabase.storage
+    .from("shortener-API")
+    .remove([`qrs/${fileName}`]);
+
+  if (deleteError) {
+    console.error("Error deleting old QR code:", deleteError);
+    throw new Error(deleteError.message);
+  }
+
+  // Upload new QR code
+  const { error: storageError } = await supabase.storage
+    .from("shortener-API")
+    .upload(`qrs/${fileName}`, qrcode);
+
+  if (storageError) throw new Error(storageError.message);
+
+  // Get public URL for the new QR code
+  const { data: publicData, error: urlError } = supabase.storage
+    .from("shortener-API")
+    .getPublicUrl(`qrs/${fileName}`);
+
+  if (urlError) throw new Error(urlError.message);
+
+  const publicURL = publicData.publicUrl;
+  console.log(`Updated Public URL: ${publicURL}`);
+
+  // Prepare update data
+  const updateData = {
+    originalUrl: longUrl,
+  };
+
+  console.log(updateData)
+
+  // Send PUT request to update the URL
+  const response = await fetch(`${URL_API}/shortener/${linkId}`, {
+    method: 'PUT',
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(updateData)
+  });
+
+  const data = await response.json();
+  console.log("updated Data", data)
+
+  if (!response.ok) {
+    console.error(data.error);
+    throw new Error(data.error || "Error updating URL");
+  }
+
+  return data.link;
 }
