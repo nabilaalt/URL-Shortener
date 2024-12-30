@@ -63,7 +63,7 @@ const LinkPage = () => {
     stats?.weekly_clicks?.[DateTime.fromISO(currentDateISO).toFormat("kkkk-'W'WW")]
       ?.clicks || 0;
 
-  console.log()
+  console.log(DateTime.fromISO(currentDateISO).toFormat("kkkk-'W'W"))
 
   const monthlyClicks =
     stats?.monthly_clicks?.[
