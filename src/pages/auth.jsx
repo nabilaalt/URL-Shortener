@@ -35,7 +35,7 @@ function Auth() {
 
       <Tabs defaultValue="login" className="w-full sm:w-[400px]">
         <TabsList className="grid w-full grid-cols-2 gap-4">
-          {/* Membuat teks lebih kecil pada mobile dan menambahkan margin untuk membuatnya lebih enak dilihat */}
+
           <TabsTrigger value="login" className="text-sm sm:text-base">
             Login
           </TabsTrigger>
