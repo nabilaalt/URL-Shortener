@@ -66,7 +66,7 @@ export async function createUrl({title, longUrl, customUrl, userId}, qrcode) {
   
   if (!response.ok) {
     const dataError = await response.json();
-    throw new Error(dataError.message || 'Failed to create the URL'); 
+    throw new Error(dataError.error || 'Failed to create the URL'); 
   }
   
   const data = await response.json();

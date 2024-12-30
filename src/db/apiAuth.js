@@ -44,27 +44,28 @@ export async function login({ email, password }) {
 }
 
 export async function signup({ name, email, password, profile_pic }) {
- 
+  // Check if profile_pic is an image
+  if (!profile_pic.type.startsWith("image/")) {
+    throw new Error("Profile picture must be an image");
+  }
+
   const fileName = `dp-${name.split(" ").join("-")}-${Math.random()}`;
 
-  
   const { error: storageError } = await supabase.storage
     .from("shortener-API")
     .upload(`profile_pic/${fileName}`, profile_pic);
 
   if (storageError) throw new Error(storageError.message);
 
- 
   const { data: publicData, error: urlError } = supabase.storage
     .from("shortener-API")
     .getPublicUrl(`profile_pic/${fileName}`);
 
   if (urlError) throw new Error(urlError.message);
 
-  const publicURL = publicData.publicUrl; 
+  const publicURL = publicData.publicUrl;
   console.log(publicURL);
 
-  
   const requestData = {
     name,
     email,
@@ -72,26 +73,22 @@ export async function signup({ name, email, password, profile_pic }) {
     profile_pic: publicURL,
   };
 
-  
   const response = await fetch(`${URL_API}/auth/register`, {
     method: "POST",
     headers: {
-      "Content-Type": "application/json", 
+      "Content-Type": "application/json",
     },
-    body: JSON.stringify(requestData), 
+    body: JSON.stringify(requestData),
   });
 
- 
   if (!response.ok) {
-   
     const errorData = await response.json();
     throw new Error(errorData.message || "Registration failed");
   }
 
- 
   const data = await response.json();
   console.log(data);
-  return data; 
+  return data;
 }
 
 
