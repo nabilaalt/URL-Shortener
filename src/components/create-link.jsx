@@ -81,6 +81,8 @@ export function CreateLink({ onNewUrl }) {
       setErrors(newErrors);
     }
   };
+
+  console.log(loading,error, data);
   
 
   useEffect(() => {
@@ -94,7 +96,7 @@ export function CreateLink({ onNewUrl }) {
       onNewUrl(data);
       setIsDialogOpen(false);
     } else if(error){
-      toast.error(error)
+      toast.error(error.message)
     }
     
   // eslint-disable-next-line react-hooks/exhaustive-deps

@@ -42,7 +42,6 @@ const Login = () => {
   };
 
   const {loading, error, fn: fnLogin, data} = useFetch(login, formData);
-  console.log(loading,error, data);
 
   useEffect(() => {
     if (error === null && data) {
@@ -54,17 +53,13 @@ const Login = () => {
   useEffect(() => {
     const verifyToken = async () => {
       if (token) {
-        // Save token to localStorage
-        console.log(token)
         const jwtSecret = new TextEncoder().encode(
           "b41897f961525dd71bdf8bdf7fd1a9ab627e5eebd26ba3cd5d75c04b1921bc9d"
-        ); // Replace with your actual secret
+        ); 
         const { payload: decoded } = await jose.jwtVerify(token, jwtSecret);
-        console.log(decoded);
-        // Store the decoded token in cache (localStorage in this case)
+       
         localStorage.setItem("decodedToken", JSON.stringify(decoded));
 
-        // Redirect to the dashboard or specific page
         navigate(`/dashboard?${longLink ? `createNew=${longLink}` : ""}`);
       }
 

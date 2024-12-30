@@ -14,7 +14,8 @@ const useFetch = (cb, options = {}) => {
       setData(response);
       setError(null);
     } catch (error) {
-      setError(error || error.message );
+      console.log("error jir", error);
+      setError(error);
     } finally {
       setLoading(false);
     }

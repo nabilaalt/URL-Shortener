@@ -42,10 +42,10 @@ export async function createUrl({title, longUrl, customUrl, userId}, qrcode) {
     .from("shortener-API")
     .getPublicUrl(`qrs/${fileName}`);
 
-  const publicURL = publicData.publicUrl; // Properly access the public URL
+  const publicURL = publicData.publicUrl; 
   console.log(`Public URL: ${publicURL}`);
 
-  if (urlError) throw new Error(urlError.message);
+  if (urlError) throw new Error(urlError);
   const requestData = {
     title,
     userId,
@@ -58,17 +58,18 @@ export async function createUrl({title, longUrl, customUrl, userId}, qrcode) {
   const response = await fetch(`${URL_API}/shortener`, {
     method: 'POST',
     headers: {
-      "Content-Type": "application/json", // Set the content type to JSON
+      "Content-Type": "application/json", 
     },
     body: JSON.stringify(requestData)
   });
 
-  const data = await response.json();
-
+  
   if (!response.ok) {
-    throw new Error(data.error || 'Failed to create the URL'); // Throw error if response is not ok
+    const dataError = await response.json();
+    throw new Error(dataError.message || 'Failed to create the URL'); 
   }
-
+  
+  const data = await response.json();
   return data.link;
 }
 
